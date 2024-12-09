@@ -1,0 +1,67 @@
+# PROGRAMA
+<programa> ::= <bloco>
+
+# PARTE INICIAL
+<bloco> ::= <declaracao-variavel>
+            | <comando-condicional>
+            | <comando-enquanto>
+            | <declaracao-funcao>
+            | <declaracao-procedimento>
+            | <chamada-procedimento>
+            | <comando-impressao>
+
+<comando-condicional> ::= "if" "(" <expressao> ")" "{" <bloco> "}" <else>
+
+# COMANDOS
+<comando-enquanto> ::= "while" "(" <expressao> ")" "{" <bloco> <desvio-incondicional> "}"
+<comando-impressao> ::= "print" (<constante> | <identificador-variavel>) ";"
+
+# DESVIOS
+<else> ::= "else" "{" <bloco> "}" | ε
+<desvio-incondicional> ::= "break" ";" | "continue" ";" | ε
+
+# VARIAVEIS
+<especificador-tipo> ::= "int" | "boolean"
+<atribuicao-variavel> ::= "=" <expressao>
+<identificador-variavel> ::= "v" (<letra-maiuscula> | <letra-minuscula> | <numero>)+
+<declaracao-variavel> ::= <variavel> ";"
+<variavel> ::= <especificador-tipo> <identificador-variavel> <atribuicao-variavel>
+
+# EXPRESSOES
+<expressao> ::= <expressao-logica>
+                | <expressao-aritmetica>
+                | <booleano>
+                | <chamada-funcao>
+                | <digito>
+
+<expressao-logica> ::= <termo> <operador-relacional> <termo>
+<expressao-aritmetica> ::= <termo> <termos-aritmeticos>
+<termos-aritmeticos> ::= ε | <operador-aritmetico> <termo>
+<termo> ::= <identificador-variavel> | <constante>
+
+# PROCEDIMENTOS
+<chamada-procedimento> ::= <identificador-procedimento> "(" <lista-parametros> ")" ";"
+<identificador-procedimento> ::= "p" (<letra-maiuscula> | <letra-minuscula> | <constante>)+
+<declaracao-procedimento> ::= "proc" <identificador-procedimento> "(" <lista-parametros> ")" "{" <bloco> "}"
+
+# FUNÇÕES
+<chamada-funcao> ::= <identificador-funcao> "(" <lista-parametros> ")"
+<identificador-funcao> ::= "f" (<letra-maiuscula> | <letra-minuscula> | <constante>)+
+<declaracao-funcao> ::= "func" <especificador-tipo> <identificador-funcao> "(" <bloco-funcao>
+<bloco-funcao> ::= <lista-parametros> ")" "{" <bloco> "return " (<identificador-variavel> | <constante> | <booleano>) "; "}"
+
+# PARAMETROS
+<lista-parametros> ::= <declaracao-parametro> <outros-parametros>
+<declaracao-parametro> ::= <especificador-tipo> <identificador-variavel>
+<outros-parametros> ::= "," <lista-parametros> | ε
+
+# TERMINAIS
+<letra-maiuscula> ::= "A" | "B" | "C" | "D" | "E" | "F" | "G" | "H" | "I" | "J" | "K" | "L" | "M" | "N" | "O" | "P" | "Q" | "R" | "S" | "T" | "U" | "V" | "W" | "X" | "Y" | "Z"
+<letra-minuscula> ::= "a" | "b" | "c" | "d" | "e" | "f" | "g" | "h" | "i" | "j" | "k" | "l" | "m" | "n" | "o" | "p" | "q" | "r" | "s" | "t" | "u" | "v" | "w" | "x" | "y" | "z"
+<constante> ::= <digito> {<digito>}
+<booleano> ::= "true" | "false"
+<digito> ::= "0" | "1" | "2" | "3" | "4" | "5" | "6" | "7" | "8" | "9"
+
+# OPERADORES
+<operador-aritmetico> ::= "+" | "-" | "*" | "/"
+<operador-relacional> ::= "==" | "!=" | ">" | ">=" | "<" | "<="
