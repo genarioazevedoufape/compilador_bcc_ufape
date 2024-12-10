@@ -1,5 +1,4 @@
 from Lexer.Scanner import Scanner
-from Lexer.Token import Token
 
 def Main():
     # Código de exemplo que será analisado
@@ -11,7 +10,6 @@ def Main():
         print 0;
     }
     """
-
     print("=== Código de Exemplo ===")
     print(codigo_exemplo)
     print("=========================\n")
