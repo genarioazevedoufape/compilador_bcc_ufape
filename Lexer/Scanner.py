@@ -1,5 +1,4 @@
 from Lexer.Token import Token
-
 class Scanner:
     def __init__(self, programa):
         self.tokens = []
