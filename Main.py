@@ -1,22 +1,36 @@
-from Scanner import Scanner
-import sys
+from Lexer.Scanner import Scanner
+from Lexer.Token import Token
+
+def Main():
+    # Código de exemplo que será analisado
+    codigo_exemplo = """
+    int v1 = 10;
+    if (v1 > 5) {
+        print v1;
+    } else {
+        print 0;
+    }
+    """
+
+    print("=== Código de Exemplo ===")
+    print(codigo_exemplo)
+    print("=========================\n")
+
+    # Criar uma instância do Scanner
+    scanner = Scanner(codigo_exemplo)
+
+    # Realizar a análise léxica
+    try:
+        tokens = scanner.scan()
+    except Exception as e:
+        print(f"Erro ao escanear o código: {e}")
+        return
+
+    # Exibir os tokens gerados
+    print("=== Tokens Gerados ===")
+    for token in tokens:
+        print(token)
+    print("======================")
 
 if __name__ == "__main__":
-    if len(sys.argv) != 2:
-        print("Uso: python Main.py <arquivo_fonte>")
-        sys.exit(1)
-
-    path = sys.argv[1]
-
-    try:
-        with open(path, 'r') as fonte:
-            programa = fonte.read()
-    except FileNotFoundError:
-        print("Erro: Código Fonte não encontrado")
-        sys.exit(1)
-
-    lexer = Scanner(programa)
-    tabTokens = lexer.scan()
-
-    for token in tabTokens:
-        print(token)
+    Main()
