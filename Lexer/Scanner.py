@@ -98,5 +98,6 @@ class Scanner:
                 else:
                     self.tokens.append(Token("ID", lexeme, self.linha))
             else:
-                print(f'Caractere Inválido na linha {self.linha}: {char}')
-                exit(2)
+                # Token inválido adicionado para análise posterior
+                self.tokens.append(Token("INVALID", char, self.linha))
+                print(f"Caractere Inválido na linha {self.linha}: {char}")
