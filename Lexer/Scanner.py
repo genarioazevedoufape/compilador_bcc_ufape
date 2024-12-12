@@ -37,21 +37,37 @@ class Scanner:
             ';': "SEMICOLON", ',': "COMMA", '+': "SUM", '-': "SUB",
             '*': "MUL", '/': "DIV"
         }
+
         while self.atual < len(self.programa):
             self.inicio = self.atual
             char = self.nextChar()
+
             if char in ' \t\r':
                 pass
             elif char == '\n':
                 self.linha += 1
             elif char in tokens_map:
                 self.tokens.append(Token(tokens_map[char], char, self.linha))
-            elif char == '=':
-                self._match_double_char('=', "EQUAL", "ATTR")
-            elif char == '<':
-                self._match_double_char('=', "LESSEQUAL", "LESS")
-            elif char == '>':
-                self._match_double_char('=', "GREATEQUAL", "GREAT")
+            elif char == "=":
+                self._match_double_char("=", "EQUAL", "ATTR")
+            elif char == "!":
+                if self.lookAhead() == "=":  # Verifica se o próximo caractere é "="
+                    self.nextChar()  # Consome o "="
+                    self.tokens.append(Token("NOTEQUAL", "!=" , self.linha))  # Adiciona o token NOTEQUAL
+                else:
+                    self.tokens.append(Token("NOT", "!" , self.linha))  # Caso contrário, é o operador NOT
+            elif char == "<":
+                if self.lookAhead() == "=":  # Verifica se o próximo caractere é "="
+                    self.nextChar()  # Consome o "="
+                    self.tokens.append(Token("LESSEQUAL", "<=" , self.linha))  # Adiciona o token LESSEQUAL
+                else:
+                    self.tokens.append(Token("LESS", "<" , self.linha))  # Caso contrário, é o operador LESS
+            elif char == ">":
+                if self.lookAhead() == "=":  # Verifica se o próximo caractere é "="
+                    self.nextChar()  # Consome o "="
+                    self.tokens.append(Token("GREATEQUAL", ">=" , self.linha))  # Adiciona o token GREATEQUAL
+                else:
+                    self.tokens.append(Token("GREAT", ">" , self.linha))  # Caso contrário, é o operador GREAT
             elif char.isdigit():
                 self._scan_number()
             elif char.isalpha():
