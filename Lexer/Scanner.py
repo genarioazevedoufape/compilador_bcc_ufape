@@ -9,7 +9,7 @@ class Scanner:
         self.linha = 1
 
     def __str__(self):
-        return "Tokens: %s\n Inicio: %s\n Atual: %s\n Linha: %s\n" % (str(self.tokens), str(self.inicio), str(self.atual), str(self.linha))
+        return f"Tokens: {self.tokens}, Inicio: {self.inicio}, Atual: {self.atual}, Linha: {self.linha}"
 
     def nextChar(self):
         self.atual += 1
@@ -27,19 +27,15 @@ class Scanner:
 
     def scanTokens(self):
         keywords = {
-            "if": "IF",
-            "else": "ELSE",
-            "while": "WHILE",
-            "break": "BREAK",
-            "continue": "CONTINUE",
-            "print": "PRINT",
-            "true": "TRUE",
-            "false": "FALSE",
-            "func": "FUNC",
-            "proc": "PROC",
-            "return": "RETURN",
-            "int": "TYPE_INT",
-            "boolean": "TYPE_BOOLEAN"
+            "if": "IF", "else": "ELSE", "while": "WHILE", "break": "BREAK",
+            "continue": "CONTINUE", "print": "PRINT", "true": "TRUE",
+            "false": "FALSE", "func": "FUNC", "proc": "PROC", "return": "RETURN",
+            "int": "TYPE_INT", "boolean": "TYPE_BOOLEAN"
+        }
+        tokens_map = {
+            '(': "LBRACK", ')': "RBRACK", '{': "LCBRACK", '}': "RCBRACK",
+            ';': "SEMICOLON", ',': "COMMA", '+': "SUM", '-': "SUB",
+            '*': "MUL", '/': "DIV"
         }
         while self.atual < len(self.programa):
             self.inicio = self.atual
@@ -48,56 +44,47 @@ class Scanner:
                 pass
             elif char == '\n':
                 self.linha += 1
-            elif char in '(){};,':
-                tokens_map = {
-                    '(': "LBRACK",
-                    ')': "RBRACK",
-                    '{': "LCBRACK",
-                    '}': "RCBRACK",
-                    ';': "SEMICOLON",
-                    ',': "COMMA"
-                }
-                self.tokens.append(Token(tokens_map[char], char, self.linha))
-            elif char in '+-*/':
-                tokens_map = {'+': "SUM", '-': "SUB", '*': "MUL", '/': "DIV"}
+            elif char in tokens_map:
                 self.tokens.append(Token(tokens_map[char], char, self.linha))
             elif char == '=':
-                if self.lookAhead() == '=':
-                    self.atual += 1
-                    self.tokens.append(Token("EQUAL", "==", self.linha))
-                else:
-                    self.tokens.append(Token("ATTR", "=", self.linha))
+                self._match_double_char('=', "EQUAL", "ATTR")
             elif char == '<':
-                if self.lookAhead() == '=':
-                    self.atual += 1
-                    self.tokens.append(Token("LESSEQUAL", "<=", self.linha))
-                else:
-                    self.tokens.append(Token("LESS", "<", self.linha))
+                self._match_double_char('=', "LESSEQUAL", "LESS")
             elif char == '>':
-                if self.lookAhead() == '=':
-                    self.atual += 1
-                    self.tokens.append(Token("GREATEQUAL", ">=", self.linha))
-                else:
-                    self.tokens.append(Token("GREAT", ">", self.linha))
+                self._match_double_char('=', "GREATEQUAL", "GREAT")
             elif char.isdigit():
-                while self.lookAhead().isdigit():
-                    self.nextChar()
-                self.tokens.append(Token("NUMBER", self.programa[self.inicio:self.atual], self.linha))
+                self._scan_number()
             elif char.isalpha():
-                while self.lookAhead().isalnum():
-                    self.nextChar()
-                lexeme = self.programa[self.inicio:self.atual]
-                if lexeme in keywords:
-                    self.tokens.append(Token(keywords[lexeme], lexeme, self.linha))
-                elif lexeme.startswith("v"):
-                    self.tokens.append(Token("ID_VAR", lexeme, self.linha))
-                elif lexeme.startswith("f"):
-                    self.tokens.append(Token("ID_FUNC", lexeme, self.linha))
-                elif lexeme.startswith("p"):
-                    self.tokens.append(Token("ID_PROC", lexeme, self.linha))
-                else:
-                    self.tokens.append(Token("ID", lexeme, self.linha))
+                self._scan_identifier(keywords)
             else:
-                # Token inválido adicionado para análise posterior
                 self.tokens.append(Token("INVALID", char, self.linha))
                 print(f"Caractere Inválido na linha {self.linha}: {char}")
+
+    def _match_double_char(self, expected, double_type, single_type):
+        if self.lookAhead() == expected:
+            self.nextChar()
+            self.tokens.append(Token(double_type, f"{expected}{expected}", self.linha))
+        else:
+            self.tokens.append(Token(single_type, expected, self.linha))
+
+    def _scan_number(self):
+        while self.lookAhead().isdigit():
+            self.nextChar()
+        if self.lookAhead() == '.':
+            self.nextChar()
+            while self.lookAhead().isdigit():
+                self.nextChar()
+        self.tokens.append(Token("NUMBER", self.programa[self.inicio:self.atual], self.linha))
+
+    def _scan_identifier(self, keywords):
+        while self.lookAhead().isalnum():
+            self.nextChar()
+        lexeme = self.programa[self.inicio:self.atual]
+        token_type = keywords.get(lexeme, "ID")
+        if lexeme.startswith("v"):
+            token_type = "ID_VAR"
+        elif lexeme.startswith("f"):
+            token_type = "ID_FUNC"
+        elif lexeme.startswith("p"):
+            token_type = "ID_PROC"
+        self.tokens.append(Token(token_type, lexeme, self.linha))
