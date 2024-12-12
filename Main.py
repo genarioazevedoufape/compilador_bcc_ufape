@@ -1,4 +1,5 @@
 from Lexer.Scanner import Scanner
+from Parser.Parser import Parser
 
 def Main():
     # Código de exemplo que será analisado
@@ -29,6 +30,16 @@ def Main():
     for token in tokens:
         print(token)
     print("======================")
+
+    # Criar uma instância do Parser
+    parser = Parser(tokens)
+
+    # Realizar a análise sintática
+    try:
+        parser.parse()
+        print("\nAnálise sintática concluída com sucesso!")
+    except SyntaxError as e:
+        print(f"Erro de sintaxe: {e}")
 
 if __name__ == "__main__":
     Main()
