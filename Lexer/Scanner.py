@@ -96,11 +96,12 @@ class Scanner:
         while self.lookAhead().isalnum():
             self.nextChar()
         lexeme = self.programa[self.inicio:self.atual]
+        # Verifica se o lexema é uma palavra reservada
         token_type = keywords.get(lexeme, "ID")
-        if lexeme.startswith("v"):
+        if lexeme.startswith("v") and token_type == "ID":
             token_type = "ID_VAR"
-        elif lexeme.startswith("f"):
+        elif lexeme.startswith("f") and token_type == "ID":
             token_type = "ID_FUNC"
-        elif lexeme.startswith("p"):
+        elif lexeme.startswith("p") and token_type == "ID":
             token_type = "ID_PROC"
         self.tokens.append(Token(token_type, lexeme, self.linha))
