@@ -10,9 +10,8 @@
             | <chamada-procedimento>
             | <comando-impressao>
 
-<comando-condicional> ::= "if" "(" <expressao> ")" "{" <bloco> "}" <else>
-
 # COMANDOS
+<comando-condicional> ::= "if" "(" <expressao> ")" "{" <bloco> "}" <else>
 <comando-enquanto> ::= "while" "(" <expressao> ")" "{" <bloco> <desvio-incondicional> "}"
 <comando-impressao> ::= "print" (<constante> | <identificador-variavel>) ";"
 
