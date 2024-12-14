@@ -9,12 +9,12 @@ class Parser:
     def match(self, expected_type):
         token = self.current_token()
         if token and token.tipo == expected_type:
-            print(f"Matched {expected_type}: {token.lexema} at line {token.linha}")  # Debugging line
+            print(f"Matched {expected_type}: {token.lexema} at line {token.linha}")  
             self.current += 1
             return token
         else:
             if token:
-                print(f"Expected {expected_type}, but got {token.tipo}: {token.lexema} at line {token.linha}")  # Debugging line
+                print(f"Expected {expected_type}, but got {token.tipo}: {token.lexema} at line {token.linha}")  
             else:
                 print(f"Expected {expected_type}, but reached end of input")
             return None
@@ -22,7 +22,7 @@ class Parser:
     def error(self, message):
         token = self.current_token()
         context = f"at line {token.linha} near '{token.lexema}'" if token else "at the end of input"
-        print(f"Error: {message} {context}")  # Debugging line
+        print(f"Error: {message} {context}")  
         raise SyntaxError(f"{message} {context}")
 
     def parse(self):
@@ -37,25 +37,25 @@ class Parser:
 
     def bloco(self):
         while self.current_token():
-            # Processa comandos válidos dentro do bloco
-            if self.declaracao_variavel():  # Declarações de variáveis
+            
+            if self.declaracao_variavel():  
                 continue
-            elif self.comando_condicional():  # Comando if
+            elif self.comando_condicional():  
                 continue
-            elif self.comando_enquanto():  # Comando while
+            elif self.comando_enquanto():  
                 continue
-            elif self.declaracao_funcao():  # Declaração de funções
+            elif self.declaracao_funcao():  
                 continue
-            elif self.declaracao_procedimento():  # Declaração de procedimento
+            elif self.declaracao_procedimento():  
                 continue
-            elif self.chamada_procedimento():  # Chamada de procedimento
+            elif self.chamada_procedimento():  
                 continue
-            elif self.chamada_funcao():  # Chamada de função
+            elif self.chamada_funcao():  
                 continue
-            elif self.comando_impressao():  # Comando de impressão
+            elif self.comando_impressao():  
                 continue
             else:
-                break  # Sai do loop se não encontrar um comando válido
+                break  
         return True
 
     def declaracao_variavel(self):
@@ -82,13 +82,13 @@ class Parser:
 
     def comando_condicional(self):
         if self.match("IF"):
-            if self.match("LBRACK"):  # Verifica a abertura do parêntese
-                if self.expressao():  # Verifica a condição do 'if'
-                    if self.match("RBRACK"):  # Fecha o parêntese
-                        if self.match("LCBRACK"):  # Abre o bloco do 'if'
-                            if self.bloco():  # Processa o bloco do 'if'
-                                if self.match("RCBRACK"):  # Fecha o bloco do 'if'
-                                    self.else_opcional()  # Verifica o 'else' (opcional)
+            if self.match("LBRACK"):  
+                if self.expressao():  
+                    if self.match("RBRACK"):  
+                        if self.match("LCBRACK"): 
+                            if self.bloco():  
+                                if self.match("RCBRACK"):  
+                                    self.else_opcional()  
                                     return True
                                 else:
                                     self.error("Esperado '}' para fechar o bloco do 'if'.")
@@ -108,11 +108,11 @@ class Parser:
 
     def else_opcional(self):
         if self.match("ELSE"):
-            if self.match("LCBRACK"):  # "{"
-                self.bloco()  # Permite bloco vazio
-                if not self.match("RCBRACK"):  # "}"
+            if self.match("LCBRACK"):  
+                self.bloco()  
+                if not self.match("RCBRACK"):  
                     self.error("Esperado '}' para fechar o bloco do 'else'.")
-        return True  # Produção vazia
+        return True  
 
 
 
@@ -122,17 +122,17 @@ class Parser:
                 if self.bloco():
                     if self.match("RCBRACK"):
                         return True
-        return False  # O else é opcional
+        return False  
 
     def comando_enquanto(self):
         if self.match("WHILE"):
-            if self.match("LBRACK"):  # "("
+            if self.match("LBRACK"):  
                 if self.expressao():
-                    if self.match("RBRACK"):  # ")"
-                        if self.match("LCBRACK"):  # "{"
+                    if self.match("RBRACK"):  
+                        if self.match("LCBRACK"):  
                             if self.bloco():
                                 self.desvio_incondicional()
-                                if self.match("RCBRACK"):  # "}"
+                                if self.match("RCBRACK"):  
                                     return True
                                 else:
                                     self.error("Esperado '}' para fechar o bloco do 'while'.")
@@ -154,12 +154,12 @@ class Parser:
                 return True
             else:
                 self.error("Esperado ';' após 'break' ou 'continue'.")
-        return True  # Produção vazia é válida
+        return True  
 
     def comando_impressao(self):
         if self.match("PRINT"):
-            if self.match("ID_VAR") or self.match("NUMBER") or self.match("TRUE") or self.match("FALSE"):  # Suporte a constantes e variáveis
-                if self.match("SEMICOLON"):  # Espera ";"
+            if self.match("ID_VAR") or self.match("NUMBER") or self.match("TRUE") or self.match("FALSE"):  
+                if self.match("SEMICOLON"):  
                     return True
                 else:
                     self.error("Esperado ';' após o comando 'print'.")
@@ -187,7 +187,7 @@ class Parser:
         return False
 
     def lista_parametros(self):
-        if self.match("RBRACK"):  # Lista vazia
+        if self.match("RBRACK"):  
             return True
         if self.declaracao_parametro():
             while self.match("COMMA"):
@@ -210,7 +210,7 @@ class Parser:
                 "EQUAL", "NOTEQUAL", "LESS", 
                 "LESSEQUAL", "GREAT", "GREATEQUAL"
             ]:
-                self.match(self.current_token().tipo)  # Consome o operador
+                self.match(self.current_token().tipo)  
                 if not (self.match("NUMBER") or self.match("ID_VAR")):
                     self.error("Esperado número ou variável após o operador")
             return True
@@ -220,7 +220,7 @@ class Parser:
         if self.termo():  # Primeiro termo
             if self.match("EQUAL") or self.match("NOTEQUAL") or \
             self.match("LESS") or self.match("LESSEQUAL") or \
-            self.match("GREAT") or self.match("GREATEQUAL"):  # Operadores relacionais
+            self.match("GREAT") or self.match("GREATEQUAL"):  
                 if not self.termo():  # Segundo termo obrigatório
                     self.error("Esperado termo após o operador relacional.")
                 return True
@@ -239,10 +239,10 @@ class Parser:
         return self.match("ID_VAR") or self.constante()
 
     def chamada_funcao(self):
-        if self.match("ID_FUNC"):  # Verifica o nome da função
-            if self.match("LBRACK"):  # Verifica a abertura dos parênteses
-                if self.lista_parametros():  # Verifica os parâmetros
-                    if self.match("RBRACK"):  # Verifica o fechamento dos parênteses
+        if self.match("ID_FUNC"):  
+            if self.match("LBRACK"):  
+                if self.lista_parametros():  
+                    if self.match("RBRACK"):  
                         return True
         return False
 
@@ -276,7 +276,7 @@ class Parser:
     def atribuicao_variavel(self):
         token = self.match("ID_VAR")
         if token:  # Identificador encontrado
-            if self.match("ATTR"):  # Encontrou o '='
+            if self.match("ATTR"):  
                 if self.expressao():
                     if self.match("SEMICOLON"):
                         return True
