@@ -10,18 +10,18 @@ Este projeto é uma ferramenta de análise léxica e sintática desenvolvida par
 
 # Componentes principais
 
-# 1. Análise Léxica (Lexer):  
+- 1. Análise Léxica (Lexer):  
    - Identifica e classifica tokens como palavras reservadas, identificadores, operadores e outros símbolos presentes no programa.
    - Implementado na classe `Scanner`.
    - Utiliza a classe `Token` para representar os tokens gerados.
 
-# 2. Análise Sintática (Parser):  
+- 2. Análise Sintática (Parser):  
    - Verifica se a sequência de tokens segue as regras gramaticais definidas.
    - Implementado na classe `Parser`, que utiliza um conjunto de métodos recursivos para interpretar diferentes partes da gramática.
 
 # Funcionalidades
 
-# Análise Léxica:
+- Análise Léxica:
   - Gera tokens para:
     - **Palavras reservadas**: `if`, `else`, `while`, `print`, etc.
     - **Tipos de dados**: `int`, `boolean`.
@@ -30,7 +30,7 @@ Este projeto é uma ferramenta de análise léxica e sintática desenvolvida par
     - **Delimitadores**: `(`, `)`, `{`, `}`, `;`, `,`.
   - Representação de tokens via classe `Token`.
 
-  # Análise Sintática:
+  - Análise Sintática:
   - Reconhece comandos como:
     - Declarações de variáveis (`int x = 10;`).
     - Condicionais (`if`, `else`).
