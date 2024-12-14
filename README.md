@@ -2,7 +2,7 @@
 ***
 ## Ferramenta de Análise Léxica e Sintática
 
-Curso: Ciência da Computação da Universidade Federal do Agreste de Pernambuco
+Curso: Ciência da Computação da Universidade Federal do Agreste de Pernambuco  
 Autores: Genário Azevedo e João Victor Iane
 ***
 ## Descrição do Projeto
