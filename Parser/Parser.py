@@ -171,18 +171,18 @@ class Parser:
         return self.match("NUMBER") or self.match("TRUE") or self.match("FALSE")
 
     def declaracao_funcao(self):
-        if self.match("FUNC"):  # Verifica se é uma função
-            if self.especificador_tipo():  # Verifica o tipo de retorno
-                if self.match("ID_FUNC"):  # Verifica o nome da função
-                    if self.match("LBRACK"):  # Verifica a abertura dos parâmetros
-                        if self.lista_parametros():  # Verifica os parâmetros
-                            if self.match("RBRACK"):  # Fecha os parâmetros
-                                if self.match("LCBRACK"):  # Inicia o bloco da função
-                                    if self.bloco():  # Verifica o corpo da função
-                                        if self.match("RETURN"):  # Verifica o comando de retorno
-                                            if self.expressao():  # Verifica a expressão retornada
-                                                if self.match("SEMICOLON"):  # Finaliza o comando de retorno
-                                                    if self.match("RCBRACK"):  # Fecha o bloco da função
+        if self.match("FUNC"):  
+            if self.especificador_tipo():  
+                if self.match("ID_FUNC"):  
+                    if self.match("LBRACK"):  
+                        if self.lista_parametros():  
+                            if self.match("RBRACK"):  
+                                if self.match("LCBRACK"):  
+                                    if self.bloco():  
+                                        if self.match("RETURN"):  
+                                            if self.expressao():  
+                                                if self.match("SEMICOLON"):  
+                                                    if self.match("RCBRACK"):  
                                                         return True
         return False
 
