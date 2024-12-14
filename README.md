@@ -39,4 +39,16 @@ Funcionalidades
 - Gramática:
   - A gramática utilizada está definida no arquivo [gramatica.bnf](./gramatica.bnf).
 
-Estrutura do Projeto(Falta)
+Estrutura do Projeto
+
+*/Lexer*
+Token.py         # Classe para representar tokens
+Scanner.py       # Implementação do analisador léxico
+
+**/Parser**
+Parser.py        # Implementação do analisador sintático
+
+gramatica.bnf    # Arquivo contendo a gramática formal
+
+Main.py          # Script principal para executar a ferramenta
+
