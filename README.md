@@ -1,4 +1,4 @@
-Ferramenta de Análise Léxica e Sintática
+_Ferramenta de Análise Léxica e Sintática_
 
 Disciplina: Compiladores  
 Curso: Ciência da Computação - UFAPE  
