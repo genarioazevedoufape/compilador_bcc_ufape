@@ -1,8 +1,9 @@
-_Ferramenta de Análise Léxica e Sintática_
+#Ferramenta de Análise Léxica e Sintática
 
 Disciplina: Compiladores  
 Curso: Ciência da Computação - UFAPE  
 Autores: Genário Azevedo e João Victor Iane
+***
 
 Descrição do Projeto
 Este projeto é uma ferramenta de análise léxica e sintática desenvolvida para a disciplina de Compiladores. A ferramenta realiza a análise de programas escritos em uma linguagem simples, identificando tokens e verificando sua conformidade com as regras gramaticais especificadas.  
