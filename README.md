@@ -1,4 +1,4 @@
-# Projeto de Compiladores - 2022.4
+# Projeto de Compiladores - 2024.2
 ***
 ## Ferramenta de Análise Léxica e Sintática
 
