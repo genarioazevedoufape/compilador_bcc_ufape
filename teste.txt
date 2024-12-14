@@ -1,6 +1,11 @@
     int v1 = 10;
+    
     if (v1 > 5) {
         print v1;
     } else {
         print 0;
+    }
+
+    func int fMultiplicar(int vX){
+    return vX * 2;
     }

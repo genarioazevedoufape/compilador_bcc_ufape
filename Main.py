@@ -13,10 +13,8 @@ def Main():
     print("=== Código de Entrada ===")
     print(codigo_exemplo)
     print("=========================\n")
-
   
     scanner = Scanner(codigo_exemplo)
-
 
     try:
         tokens = scanner.scan()
@@ -24,15 +22,12 @@ def Main():
         print(f"Erro ao escanear o código: {e}")
         return
 
-
     print("=== Tokens Gerados ===")
     for token in tokens:
         print(token)
     print("======================")
 
-
     parser = Parser(tokens)
-
 
     try:
         parser.parse()

@@ -59,17 +59,17 @@ class Parser:
         return True
 
     def declaracao_variavel(self):
-        if self.especificador_tipo():  # Verifica se o tipo foi especificado
-            if self.match("ID_VAR"):  # Verifica se o identificador da variável é válido
-                if self.match("ATTR"):  # Verifica se existe atribuição
-                    if self.expressao():  # Verifica se há uma expressão válida
-                        if self.match("SEMICOLON"):  # Espera o ';' após a atribuição
+        if self.especificador_tipo(): 
+            if self.match("ID_VAR"): 
+                if self.match("ATTR"):  
+                    if self.expressao(): 
+                        if self.match("SEMICOLON"):  
                             return True
                         else:
                             self.error("Esperado ';' após a atribuição da variável.")
                     else:
                         self.error("Expressão inválida na atribuição da variável.")
-                elif self.match("SEMICOLON"):  # Caso não haja atribuição, espera o ';'
+                elif self.match("SEMICOLON"):
                     return True
                 else:
                     self.error("Esperado ';' após o identificador da variável.")
@@ -90,18 +90,7 @@ class Parser:
                                 if self.match("RCBRACK"):  
                                     self.else_opcional()  
                                     return True
-                                else:
-                                    self.error("Esperado '}' para fechar o bloco do 'if'.")
-                            else:
-                                self.error("Bloco inválido dentro do 'if'.")
-                        else:
-                            self.error("Esperado '{' para iniciar o bloco do 'if'.")
-                    else:
-                        self.error("Esperado ')' para fechar a condição do 'if'.")
-                else:
-                    self.error("Expressão inválida na condição do 'if'.")
-            else:
-                self.error("Esperado '(' após 'if'.")
+
         return False
 
 
@@ -134,27 +123,15 @@ class Parser:
                                 self.desvio_incondicional()
                                 if self.match("RCBRACK"):  
                                     return True
-                                else:
-                                    self.error("Esperado '}' para fechar o bloco do 'while'.")
-                            else:
-                                self.error("Bloco inválido dentro do 'while'.")
-                        else:
-                            self.error("Esperado '{' para iniciar o bloco do 'while'.")
-                    else:
-                        self.error("Esperado ')' para fechar a condição do 'while'.")
-                else:
-                    self.error("Expressão inválida na condição do 'while'.")
-            else:
-                self.error("Esperado '(' após 'while'.")
         return False
 
-    def desvio_incondicional(self):
-        if self.match("BREAK") or self.match("CONTINUE"):
-            if self.match("SEMICOLON"):
-                return True
-            else:
-                self.error("Esperado ';' após 'break' ou 'continue'.")
-        return True  
+    # def desvio_incondicional(self):
+    #     if self.match("BREAK") or self.match("CONTINUE"):
+    #         if self.match("SEMICOLON"):
+    #             return True
+    #         else:
+    #             self.error("Esperado ';' após 'break' ou 'continue'.")
+    #     return True  
 
     def comando_impressao(self):
         if self.match("PRINT"):
@@ -202,8 +179,20 @@ class Parser:
                 return True
         return False
 
+    # def expressao(self):
+    #     if self.match("ID_VAR") or self.match("NUMBER") or self.match("TRUE") or self.match("FALSE"):
+    #         while self.current_token() and self.current_token().tipo in [
+    #             "SUM", "SUB", "MUL", "DIV", 
+    #             "EQUAL", "NOTEQUAL", "LESS", 
+    #             "LESSEQUAL", "GREAT", "GREATEQUAL"
+    #         ]:
+    #             self.match(self.current_token().tipo)
+    #         return True
+    #     elif self.chamada_funcao():
+    #         return True
+    #     return False
+
     def expressao(self):
-        # Expressão pode ser lógica, aritmética ou uma expressão simples
         if self.match("NUMBER") or self.match("ID_VAR") or self.match("TRUE") or self.match("FALSE"):
             while self.current_token() and self.current_token().tipo in [
                 "SUM", "SUB", "MUL", "DIV", 
@@ -214,18 +203,30 @@ class Parser:
                 if not (self.match("NUMBER") or self.match("ID_VAR")):
                     self.error("Esperado número ou variável após o operador")
             return True
+
+        elif self.chamada_funcao():  # Check if it's a function call
+            return True
         return False
+
+    # def expressao_logica(self):
+    #     if self.termo():  # Primeiro termo
+    #         if self.match("EQUAL") or self.match("NOTEQUAL") or \
+    #         self.match("LESS") or self.match("LESSEQUAL") or \
+    #         self.match("GREAT") or self.match("GREATEQUAL"):  
+    #             if not self.termo():  # Segundo termo obrigatório
+    #                 self.error("Esperado termo após o operador relacional.")
+    #             return True
+    #     return False
 
     def expressao_logica(self):
-        if self.termo():  # Primeiro termo
-            if self.match("EQUAL") or self.match("NOTEQUAL") or \
-            self.match("LESS") or self.match("LESSEQUAL") or \
-            self.match("GREAT") or self.match("GREATEQUAL"):  
-                if not self.termo():  # Segundo termo obrigatório
-                    self.error("Esperado termo após o operador relacional.")
-                return True
+        if self.termo():
+            while self.match("EQUAL") or self.match("NOTEQUAL") or \
+                self.match("LESS") or self.match("LESSEQUAL") or \
+                self.match("GREAT") or self.match("GREATEQUAL"):
+                if not self.termo():  # Espera um termo após o operador lógico
+                    self.error("Esperado termo após operador lógico.")
+            return True
         return False
-
 
     def expressao_aritmetica(self):
         if self.termo():  # Primeiramente, verifica um termo
