@@ -51,23 +51,23 @@ class Scanner:
             elif char == "=":
                 self._match_double_char("=", "EQUAL", "ATTR")
             elif char == "!":
-                if self.lookAhead() == "=":  # Verifica se o próximo caractere é "="
-                    self.nextChar()  # Consome o "="
-                    self.tokens.append(Token("NOTEQUAL", "!=" , self.linha))  # Adiciona o token NOTEQUAL
+                if self.lookAhead() == "=":  
+                    self.nextChar()  
+                    self.tokens.append(Token("NOTEQUAL", "!=" , self.linha))  
                 else:
-                    self.tokens.append(Token("NOT", "!" , self.linha))  # Caso contrário, é o operador NOT
+                    self.tokens.append(Token("NOT", "!" , self.linha))  
             elif char == "<":
-                if self.lookAhead() == "=":  # Verifica se o próximo caractere é "="
-                    self.nextChar()  # Consome o "="
-                    self.tokens.append(Token("LESSEQUAL", "<=" , self.linha))  # Adiciona o token LESSEQUAL
+                if self.lookAhead() == "=":  
+                    self.nextChar()  
+                    self.tokens.append(Token("LESSEQUAL", "<=" , self.linha))  
                 else:
-                    self.tokens.append(Token("LESS", "<" , self.linha))  # Caso contrário, é o operador LESS
+                    self.tokens.append(Token("LESS", "<" , self.linha))  
             elif char == ">":
-                if self.lookAhead() == "=":  # Verifica se o próximo caractere é "="
-                    self.nextChar()  # Consome o "="
-                    self.tokens.append(Token("GREATEQUAL", ">=" , self.linha))  # Adiciona o token GREATEQUAL
+                if self.lookAhead() == "=":  
+                    self.nextChar()  
+                    self.tokens.append(Token("GREATEQUAL", ">=" , self.linha))  
                 else:
-                    self.tokens.append(Token("GREAT", ">" , self.linha))  # Caso contrário, é o operador GREAT
+                    self.tokens.append(Token("GREAT", ">" , self.linha))  
             elif char.isdigit():
                 self._scan_number()
             elif char.isalpha():
@@ -96,7 +96,7 @@ class Scanner:
         while self.lookAhead().isalnum():
             self.nextChar()
         lexeme = self.programa[self.inicio:self.atual]
-        # Verifica se o lexema é uma palavra reservada
+        
         token_type = keywords.get(lexeme, "ID")
         if lexeme.startswith("v") and token_type == "ID":
             token_type = "ID_VAR"
