@@ -27,7 +27,7 @@ Funcionalidades
     - **Delimitadores**: `(`, `)`, `{`, `}`, `;`, `,`.
   - Representação de tokens via classe `Token`.
 
-- ´Análise Sintática´:
+- *Análise Sintática*:
   - Reconhece comandos como:
     - Declarações de variáveis (`int x = 10;`).
     - Condicionais (`if`, `else`).
