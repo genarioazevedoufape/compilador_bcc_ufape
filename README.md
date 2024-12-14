@@ -42,10 +42,13 @@ Funcionalidades
 Estrutura do Projeto
 
 */Lexer*
+
 Token.py         # Classe para representar tokens
+
 Scanner.py       # Implementação do analisador léxico
 
 **/Parser**
+
 Parser.py        # Implementação do analisador sintático
 
 gramatica.bnf    # Arquivo contendo a gramática formal
