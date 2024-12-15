@@ -228,7 +228,7 @@ class Parser:
         if self.expressao():
             while self.match("COMMA"):
                 if not self.expressao():
-                    self.error("Expressão esperada após ',' nos argumentos da função.")
+                    self.error("Expressão esperada após ',' nos argumentos.")
             return True
         return False
 
@@ -261,10 +261,14 @@ class Parser:
     def chamada_procedimento(self):
         if self.match("ID_PROC"):
             if self.match("LBRACK"):
-                self.lista_parametros()
-                if self.match("RBRACK"):
-                    if self.match("SEMICOLON"):
-                        return True
+                if self.lista_argumentos():
+                    if self.match("RBRACK"):
+                        if self.match("SEMICOLON"):
+                            return True
+                else:
+                    self.error("Argumentos inválidos na chamada do procedimento.")
+            else:
+                self.error("Esperado '(' para iniciar a chamada do procedimento.")
         return False
     
     def desvio_incondicional(self):
