@@ -18,3 +18,7 @@ proc pExibirMensagem(int vNumero){
 }
 
 pExibirMensagem(vA);
+
+while(vNumero) {
+    print vNumero;
+}

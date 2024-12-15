@@ -57,6 +57,34 @@ class Parser:
             else:
                 break  
         return True
+    
+    # def bloco(self):
+    #     while self.current_token():
+    #         if self.declaracao_variavel():
+    #             continue
+    #         elif self.comando_condicional():
+    #             continue
+    #         elif self.comando_enquanto():
+    #             continue
+    #         elif self.declaracao_funcao():
+    #             continue
+    #         elif self.declaracao_procedimento():
+    #             continue
+    #         elif self.chamada_procedimento():
+    #             continue
+    #         elif self.chamada_funcao():
+    #             continue
+    #         elif self.comando_impressao():
+    #             continue
+    #         else:
+    #             token = self.current_token()
+    #             if token:
+    #                 self.error(
+    #                     f"Comando inválido ou inesperado: '{token.lexema}' na linha {token.linha}. Análise sintática falhou."
+    #                 )
+    #             else:
+    #                 self.error("Fim de entrada inesperado durante a análise.")
+    #     return True
 
     def declaracao_variavel(self):
         if self.especificador_tipo(): 
@@ -82,43 +110,61 @@ class Parser:
 
     def comando_condicional(self):
         if self.match("IF"):
-            if self.match("LBRACK"):  
-                if self.expressao():  
-                    if self.match("RBRACK"):  
-                        if self.match("LCBRACK"): 
-                            if self.bloco():  
-                                if self.match("RCBRACK"):  
-                                    self.else_opcional()  
+            if self.match("LBRACK"):
+                if self.expressao():
+                    if self.match("RBRACK"):
+                        if self.match("LCBRACK"):
+                            if self.bloco():
+                                if self.match("RCBRACK"):
+                                    self.else_opcional()
                                     return True
-
+                                else:
+                                    self.error("Esperado '}' para fechar o bloco do 'if'.")
+                            else:
+                                self.error("Bloco do 'if' inválido.")
+                        else:
+                            self.error("Esperado '{' para iniciar o bloco do 'if'.")
+                    else:
+                        self.error("Esperado ')' para fechar a condição do 'if'.")
+                else:
+                    self.error("Condição do 'if' inválida.")
+            else:
+                self.error("Esperado '(' para abrir a condição do 'if'.")
         return False
 
     def else_opcional(self):
         if self.match("ELSE"):
-            if self.match("LCBRACK"):  
-                self.bloco()  
-                if not self.match("RCBRACK"):  
-                    self.error("Esperado '}' para fechar o bloco do 'else'.")
-        return True  
-
-    def else_part(self):
-        if self.match("ELSE"):
             if self.match("LCBRACK"):
                 if self.bloco():
-                    if self.match("RCBRACK"):
-                        return True
-        return False  
+                    if not self.match("RCBRACK"):
+                        self.error("Esperado '}' para fechar o bloco do 'else'.")
+                else:
+                    self.error("Bloco do 'else' inválido.")
+            else:
+                self.error("Esperado '{' para abrir o bloco do 'else'.")
+        return True
 
     def comando_enquanto(self):
         if self.match("WHILE"):
-            if self.match("LBRACK"):  
+            if self.match("LBRACK"):
                 if self.expressao():
-                    if self.match("RBRACK"):  
-                        if self.match("LCBRACK"):  
+                    if self.match("RBRACK"):
+                        if self.match("LCBRACK"):
                             if self.bloco():
-                                self.desvio_incondicional()
-                                if self.match("RCBRACK"):  
+                                if self.match("RCBRACK"):
                                     return True
+                                else:
+                                    self.error("Esperado '}' para fechar o bloco do 'while'.")
+                            else:
+                                self.error("Bloco do 'while' inválido.")
+                        else:
+                            self.error("Esperado '{' para iniciar o bloco do 'while'.")
+                    else:
+                        self.error("Esperado ')' para fechar a condição do 'while'.")
+                else:
+                    self.error("Condição do 'while' inválida.")
+            else:
+                self.error("Esperado '(' para abrir a condição do 'while'.")
         return False
 
     def comando_impressao(self):
@@ -244,6 +290,20 @@ class Parser:
                                 if self.bloco():
                                     if self.match("RCBRACK"):
                                         return True
+                                    else:
+                                        self.error("Esperado '}' para fechar o bloco do procedimento.")
+                                else:
+                                    self.error("Bloco do procedimento inválido.")
+                            else:
+                                self.error("Esperado '{' para iniciar o bloco do procedimento.")
+                        else:
+                            self.error("Esperado ')' para fechar os parâmetros do procedimento.")
+                    else:
+                        self.error("Parâmetros inválidos no procedimento.")
+                else:
+                    self.error("Esperado '(' para abrir os parâmetros do procedimento.")
+            else:
+                self.error("Esperado identificador do procedimento.")
         return False
 
     def chamada_procedimento(self):
