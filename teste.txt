@@ -1,11 +1,20 @@
-    int v1 = 10;
-    
-    if (v1 > 5) {
-        print v1;
-    } else {
-        print 0;
-    }
+int vA = 5;
+int vB = 10;
 
-    func int fMultiplicar(int vX){
+func int fMultiplicar(int vX){
     return vX * 2;
-    }
+}
+
+if (vA < vB) {
+    int vC = fMultiplicar(vA, vB);
+    print vC;
+} else {
+    int vC = fMultiplicar(vB);
+    print vC;
+}
+
+proc pExibirMensagem(int vNumero){
+    print vNumero;
+}
+
+pExibirMensagem(vA);

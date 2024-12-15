@@ -9,19 +9,19 @@ class Parser:
     def match(self, expected_type):
         token = self.current_token()
         if token and token.tipo == expected_type:
-            print(f"Matched {expected_type}: {token.lexema} at line {token.linha}")  
+            print(f"Matched {expected_type}: {token.lexema} na linha {token.linha}")  
             self.current += 1
             return token
-        else:
-            if token:
-                print(f"Expected {expected_type}, but got {token.tipo}: {token.lexema} at line {token.linha}")  
-            else:
-                print(f"Expected {expected_type}, but reached end of input")
-            return None
+        # else:
+        #     if token:
+        #         print(f"Expected {expected_type}, mas chegou {token.tipo}: {token.lexema} na linha {token.linha}")  
+        #     else:
+        #         print(f"Expected {expected_type}, mas chegou ao fim da entrada")
+        #     return None
 
     def error(self, message):
         token = self.current_token()
-        context = f"at line {token.linha} near '{token.lexema}'" if token else "at the end of input"
+        context = f"Na linha {token.linha} encontrou '{token.lexema}'" if token else "no final da entrada"
         print(f"Error: {message} {context}")  
         raise SyntaxError(f"{message} {context}")
 
@@ -93,8 +93,6 @@ class Parser:
 
         return False
 
-
-
     def else_opcional(self):
         if self.match("ELSE"):
             if self.match("LCBRACK"):  
@@ -102,8 +100,6 @@ class Parser:
                 if not self.match("RCBRACK"):  
                     self.error("Esperado '}' para fechar o bloco do 'else'.")
         return True  
-
-
 
     def else_part(self):
         if self.match("ELSE"):
@@ -124,14 +120,6 @@ class Parser:
                                 if self.match("RCBRACK"):  
                                     return True
         return False
-
-    # def desvio_incondicional(self):
-    #     if self.match("BREAK") or self.match("CONTINUE"):
-    #         if self.match("SEMICOLON"):
-    #             return True
-    #         else:
-    #             self.error("Esperado ';' após 'break' ou 'continue'.")
-    #     return True  
 
     def comando_impressao(self):
         if self.match("PRINT"):
@@ -161,6 +149,14 @@ class Parser:
                                                 if self.match("SEMICOLON"):  
                                                     if self.match("RCBRACK"):  
                                                         return True
+                                        else:
+                                            self.error("Esperado 'return' com uma expressão válida.")
+                                else:
+                                    self.error("Esperado '{' para iniciar o corpo da função.")
+                        else:
+                            self.error("Lista de parâmetros inválida ou ausente.")
+                    else:
+                        self.error("Esperado '(' para declarar os parâmetros da função.")
         return False
 
     def lista_parametros(self):
@@ -169,28 +165,15 @@ class Parser:
         if self.declaracao_parametro():
             while self.match("COMMA"):
                 if not self.declaracao_parametro():
-                    self.error("Expected parameter after ','")
+                    self.error("Parâmetro esperado após ','")
             return True
         return False
 
     def declaracao_parametro(self):
-        if self.especificador_tipo():
+        if self.especificador_tipo() or self.match("ID_VAR"):
             if self.match("ID_VAR"):
                 return True
         return False
-
-    # def expressao(self):
-    #     if self.match("ID_VAR") or self.match("NUMBER") or self.match("TRUE") or self.match("FALSE"):
-    #         while self.current_token() and self.current_token().tipo in [
-    #             "SUM", "SUB", "MUL", "DIV", 
-    #             "EQUAL", "NOTEQUAL", "LESS", 
-    #             "LESSEQUAL", "GREAT", "GREATEQUAL"
-    #         ]:
-    #             self.match(self.current_token().tipo)
-    #         return True
-    #     elif self.chamada_funcao():
-    #         return True
-    #     return False
 
     def expressao(self):
         if self.match("NUMBER") or self.match("ID_VAR") or self.match("TRUE") or self.match("FALSE"):
@@ -204,19 +187,9 @@ class Parser:
                     self.error("Esperado número ou variável após o operador")
             return True
 
-        elif self.chamada_funcao():  # Check if it's a function call
+        elif self.chamada_funcao():  
             return True
         return False
-
-    # def expressao_logica(self):
-    #     if self.termo():  # Primeiro termo
-    #         if self.match("EQUAL") or self.match("NOTEQUAL") or \
-    #         self.match("LESS") or self.match("LESSEQUAL") or \
-    #         self.match("GREAT") or self.match("GREATEQUAL"):  
-    #             if not self.termo():  # Segundo termo obrigatório
-    #                 self.error("Esperado termo após o operador relacional.")
-    #             return True
-    #     return False
 
     def expressao_logica(self):
         if self.termo():
@@ -232,7 +205,7 @@ class Parser:
         if self.termo():  # Primeiramente, verifica um termo
             while self.match("SUM") or self.match("SUB") or self.match("MUL") or self.match("DIV"):
                 if not self.termo():
-                    self.error("Expected term after operator in arithmetic expression")
+                    self.error("Termo esperado após operador na expressão aritmética")
             return True
         return False
 
@@ -242,9 +215,23 @@ class Parser:
     def chamada_funcao(self):
         if self.match("ID_FUNC"):  
             if self.match("LBRACK"):  
-                if self.lista_parametros():  
+                if self.lista_argumentos():  
                     if self.match("RBRACK"):  
                         return True
+                else:
+                    self.error("Argumentos inválidos na chamada da função.")
+            else:
+                self.error("Esperado '(' para iniciar a chamada da função.")
+        return False
+    
+    def lista_argumentos(self):
+        if self.match("RBRACK"):  # Nenhum argumento
+            return True
+        if self.expressao():
+            while self.match("COMMA"):
+                if not self.expressao():
+                    self.error("Expressão esperada após ',' nos argumentos da função.")
+            return True
         return False
 
     def declaracao_procedimento(self):
@@ -267,12 +254,14 @@ class Parser:
                     if self.match("SEMICOLON"):
                         return True
         return False
-
+    
     def desvio_incondicional(self):
         if self.match("BREAK") or self.match("CONTINUE"):
             if self.match("SEMICOLON"):
                 return True
-        return False
+            else:
+                self.error("Esperado ';' após 'break' ou 'continue'.")
+        return True  
 
     def atribuicao_variavel(self):
         token = self.match("ID_VAR")
@@ -282,5 +271,5 @@ class Parser:
                     if self.match("SEMICOLON"):
                         return True
                     else:
-                        self.error("Expected ';' at the end of assignment")
+                        self.error("Esperado ';' no final da tarefa")
         return False
