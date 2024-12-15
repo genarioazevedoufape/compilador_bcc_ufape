@@ -97,11 +97,11 @@ class Scanner:
             self.nextChar()
         lexeme = self.programa[self.inicio:self.atual]
         
-        token_type = keywords.get(lexeme, "ID")
-        if lexeme.startswith("v") and token_type == "ID":
+        token_type = keywords.get(lexeme, "CARACTERE")
+        if lexeme.startswith("v") and token_type == "CARACTERE":
             token_type = "ID_VAR"
-        elif lexeme.startswith("f") and token_type == "ID":
+        elif lexeme.startswith("f") and token_type == "CARACTERE":
             token_type = "ID_FUNC"
-        elif lexeme.startswith("p") and token_type == "ID":
+        elif lexeme.startswith("p") and token_type == "CARACTERE":
             token_type = "ID_PROC"
         self.tokens.append(Token(token_type, lexeme, self.linha))

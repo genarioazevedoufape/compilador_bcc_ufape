@@ -12,13 +12,7 @@ class Parser:
             print(f"Matched {expected_type}: {token.lexema} na linha {token.linha}")  
             self.current += 1
             return token
-        # else:
-        #     if token:
-        #         print(f"Expected {expected_type}, mas chegou {token.tipo}: {token.lexema} na linha {token.linha}")  
-        #     else:
-        #         print(f"Expected {expected_type}, mas chegou ao fim da entrada")
-        #     return None
-
+        return None
     def error(self, message):
         token = self.current_token()
         context = f"Na linha {token.linha} encontrou '{token.lexema}'" if token else "no final da entrada"
@@ -37,54 +31,30 @@ class Parser:
 
     def bloco(self):
         while self.current_token():
-            
-            if self.declaracao_variavel():  
+            token = self.current_token()
+            # Verificar caracteres fora das regras da gramática
+            if token.tipo == "NUMBER" or token.tipo == "CARACTERE":
+                self.error(f"Erro: entrada inválida:'{token.lexema}' encontrado na linha {token.linha}, posição inválida no código.")
+
+            if self.declaracao_variavel():
                 continue
-            elif self.comando_condicional():  
+            elif self.comando_condicional():
                 continue
-            elif self.comando_enquanto():  
+            elif self.comando_enquanto():
                 continue
-            elif self.declaracao_funcao():  
+            elif self.declaracao_funcao():
                 continue
-            elif self.declaracao_procedimento():  
+            elif self.declaracao_procedimento():
                 continue
-            elif self.chamada_procedimento():  
+            elif self.chamada_procedimento():
                 continue
-            elif self.chamada_funcao():  
+            elif self.chamada_funcao():
                 continue
-            elif self.comando_impressao():  
+            elif self.comando_impressao():
                 continue
             else:
-                break  
+                break
         return True
-    
-    # def bloco(self):
-    #     while self.current_token():
-    #         if self.declaracao_variavel():
-    #             continue
-    #         elif self.comando_condicional():
-    #             continue
-    #         elif self.comando_enquanto():
-    #             continue
-    #         elif self.declaracao_funcao():
-    #             continue
-    #         elif self.declaracao_procedimento():
-    #             continue
-    #         elif self.chamada_procedimento():
-    #             continue
-    #         elif self.chamada_funcao():
-    #             continue
-    #         elif self.comando_impressao():
-    #             continue
-    #         else:
-    #             token = self.current_token()
-    #             if token:
-    #                 self.error(
-    #                     f"Comando inválido ou inesperado: '{token.lexema}' na linha {token.linha}. Análise sintática falhou."
-    #                 )
-    #             else:
-    #                 self.error("Fim de entrada inesperado durante a análise.")
-    #     return True
 
     def declaracao_variavel(self):
         if self.especificador_tipo(): 
@@ -237,24 +207,6 @@ class Parser:
             return True
         return False
 
-    def expressao_logica(self):
-        if self.termo():
-            while self.match("EQUAL") or self.match("NOTEQUAL") or \
-                self.match("LESS") or self.match("LESSEQUAL") or \
-                self.match("GREAT") or self.match("GREATEQUAL"):
-                if not self.termo():  # Espera um termo após o operador lógico
-                    self.error("Esperado termo após operador lógico.")
-            return True
-        return False
-
-    def expressao_aritmetica(self):
-        if self.termo():  # Primeiramente, verifica um termo
-            while self.match("SUM") or self.match("SUB") or self.match("MUL") or self.match("DIV"):
-                if not self.termo():
-                    self.error("Termo esperado após operador na expressão aritmética")
-            return True
-        return False
-
     def termo(self):
         return self.match("ID_VAR") or self.constante()
 
@@ -321,7 +273,7 @@ class Parser:
                 return True
             else:
                 self.error("Esperado ';' após 'break' ou 'continue'.")
-        return True  
+        return False # Este "return True" parece ser um erro lógico, pois deve retornar False se nada for processado
 
     def atribuicao_variavel(self):
         token = self.match("ID_VAR")
