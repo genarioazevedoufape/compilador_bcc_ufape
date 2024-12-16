@@ -1,30 +1,46 @@
-int vA = 5;
-int vB = 10;
+int vA = 7;
+int vB = 15;
+int vX = 0;
 
-func int fMultiplicar(int vX){
-    return vX * 2;
+
+func int fSomar(int v1, int v2) {
+    return v1 + v2;
 }
 
-if (vA < vB) {
-    int vC = fMultiplicar(vA, vB);
-    print vC;
-} else {
-    int vC = fMultiplicar(vB);
-    print vC;
+func boolean fEhPar(int vNumero) {
+    return vNumero / 2 * 2 == vNumero;
 }
 
-proc pExibirMensagem(int vNumero){
-    print vNumero;
+
+func int fMultiplicar(int vNumero) {
+    int vMultiplicado = vNumero * 2;
+    return vMultiplicado;
 }
+
+
+
+proc pContador(int vInicio, int vFim) {
+    while (vInicio <= vFim) {
+        print vInicio;
+        int vInicio = vInicio + 1;
+    }
+}
+
+pContador(1, 5);
 
 while (vX < 10) {
     if (vX == 5) {
+        int vX = vX + 1;
         continue;
     } else {
         break;
     }
-    int vX = vX + 1;
+    int vX = vX + 1;  
 }
 
-pMultiplicaring(vX);
-fMultiplicaring(vY);
+int vResultado = fSomar(vA, vB);
+print vResultado;
+
+boolean vPar = fEhPar(vResultado);
+fMultiplicar(vX);
+

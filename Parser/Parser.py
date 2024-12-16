@@ -177,6 +177,8 @@ class Parser:
                             self.error("Lista de parâmetros inválida ou ausente.")
                     else:
                         self.error("Esperado '(' para declarar os parâmetros da função.")
+                else:
+                    self.error("Esperado identificador da função.")
         return False
 
     def lista_parametros(self):

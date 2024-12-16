@@ -22,10 +22,10 @@ def Main():
         print(f"Erro ao escanear o código: {e}")
         return
 
-    print("=== Tokens Gerados ===")
-    for token in tokens:
-        print(token)
-    print("======================")
+    # print("=== Tokens Gerados ===")
+    # for token in tokens:
+    #     print(token)
+    # print("======================")
 
     parser = Parser(tokens)
 
