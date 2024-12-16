@@ -69,14 +69,14 @@ class Parser:
         
         if self.match("ID_VAR"):
             if self.match("ATTR"):  
-                if self.expressao() or self.chamada_funcao():  # Permite expressões e chamadas de função
-                    if self.match("SEMICOLON"):  # Valida o ponto e vírgula aqui
+                if self.expressao() or self.chamada_funcao():  
+                    if self.match("SEMICOLON"):  
                         return True
                     else:
                         self.error("Esperado ';' após a atribuição da variável.")
                 else:
                     self.error("Expressão inválida na atribuição da variável.")
-            elif self.match("SEMICOLON"):  # Declaração sem inicialização
+            elif self.match("SEMICOLON"):  
                 return True
             else:
                 self.error("Esperado ';' após o identificador da variável.")
