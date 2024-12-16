@@ -17,9 +17,14 @@ proc pExibirMensagem(int vNumero){
     print vNumero;
 }
 
-pExibirMensagem(vA);
-
-while(vNumero) {
-    print vNumero;
+while (vX < 10) {
+    if (vX == 5) {
+        continue;
+    } else {
+        break;
+    }
+    int vX = vX + 1;
 }
-pMultiplicar(vA)
+
+pMultiplicaring(vX);
+fMultiplicaring(vY);
