@@ -17,8 +17,6 @@ func int fMultiplicar(int vNumero) {
     return vMultiplicado;
 }
 
-
-
 proc pContador(int vInicio, int vFim) {
     while (vInicio <= vFim) {
         print vInicio;
