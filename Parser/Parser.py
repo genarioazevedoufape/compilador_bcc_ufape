@@ -49,25 +49,29 @@ class Parser:
             elif self.chamada_procedimento():
                 continue
             elif self.chamada_funcao():
+                if not self.match("SEMICOLON"):  
+                    self.error("Esperado ';' após a chamada da função.")
                 continue
             elif self.comando_impressao():
+                continue
+            elif self.desvio_incondicional(): 
                 continue
             else:
                 break
         return True
 
     def declaracao_variavel(self):
-        if self.especificador_tipo(): 
-            if self.match("ID_VAR"): 
+        if self.especificador_tipo():
+            if self.match("ID_VAR"):
                 if self.match("ATTR"):  
-                    if self.expressao(): 
-                        if self.match("SEMICOLON"):  
+                    if self.expressao() or self.chamada_funcao():  # Permite expressões e chamadas de função
+                        if self.match("SEMICOLON"):  # Valida o ponto e vírgula aqui
                             return True
                         else:
                             self.error("Esperado ';' após a atribuição da variável.")
                     else:
                         self.error("Expressão inválida na atribuição da variável.")
-                elif self.match("SEMICOLON"):
+                elif self.match("SEMICOLON"):  # Declaração sem inicialização
                     return True
                 else:
                     self.error("Esperado ';' após o identificador da variável.")
@@ -259,33 +263,26 @@ class Parser:
         return False
 
     def chamada_procedimento(self):
-        if self.match("ID_PROC"):
-            if self.match("LBRACK"):
-                if self.lista_argumentos():
-                    if self.match("RBRACK"):
-                        if self.match("SEMICOLON"):
+        if self.match("ID_PROC"): 
+            if self.match("LBRACK"): 
+                if self.lista_argumentos():  
+                    if self.match("RBRACK"):  
+                        if self.match("SEMICOLON"):  
                             return True
+                        else:
+                            self.error("Esperado ';' após a chamada do procedimento.")
+                    else:
+                        self.error("Esperado ')' para fechar os argumentos do procedimento.")
                 else:
                     self.error("Argumentos inválidos na chamada do procedimento.")
             else:
-                self.error("Esperado '(' para iniciar a chamada do procedimento.")
+                self.error("Esperado '(' para iniciar os argumentos do procedimento.")
         return False
-    
+
     def desvio_incondicional(self):
         if self.match("BREAK") or self.match("CONTINUE"):
             if self.match("SEMICOLON"):
                 return True
             else:
                 self.error("Esperado ';' após 'break' ou 'continue'.")
-        return False # Este "return True" parece ser um erro lógico, pois deve retornar False se nada for processado
-
-    def atribuicao_variavel(self):
-        token = self.match("ID_VAR")
-        if token:  # Identificador encontrado
-            if self.match("ATTR"):  
-                if self.expressao():
-                    if self.match("SEMICOLON"):
-                        return True
-                    else:
-                        self.error("Esperado ';' no final da tarefa")
-        return False
+        return False 
