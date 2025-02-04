@@ -3,13 +3,14 @@ from Lexer.Token import Token
 class Scanner:
     def __init__(self, programa):
         self.tokens = []
+        self.symbol_table = {}  # Tabela de símbolos
         self.programa = programa
         self.inicio = 0
         self.atual = 0
         self.linha = 1
 
     def __str__(self):
-        return f"Tokens: {self.tokens}, Inicio: {self.inicio}, Atual: {self.atual}, Linha: {self.linha}"
+        return f"Tokens: {self.tokens}, Symbol Table: {self.symbol_table}, Inicio: {self.inicio}, Atual: {self.atual}, Linha: {self.linha}"
 
     def nextChar(self):
         self.atual += 1
@@ -51,30 +52,29 @@ class Scanner:
             elif char == "=":
                 self._match_double_char("=", "EQUAL", "ATTR")
             elif char == "!":
-                if self.lookAhead() == "=":  
-                    self.nextChar()  
-                    self.tokens.append(Token("NOTEQUAL", "!=" , self.linha))  
+                if self.lookAhead() == "=":
+                    self.nextChar()
+                    self.tokens.append(Token("NOTEQUAL", "!=" , self.linha))
                 else:
-                    self.tokens.append(Token("NOT", "!" , self.linha))  
+                    self.tokens.append(Token("NOT", "!" , self.linha))
             elif char == "<":
-                if self.lookAhead() == "=":  
-                    self.nextChar()  
-                    self.tokens.append(Token("LESSEQUAL", "<=" , self.linha))  
+                if self.lookAhead() == "=":
+                    self.nextChar()
+                    self.tokens.append(Token("LESSEQUAL", "<=" , self.linha))
                 else:
-                    self.tokens.append(Token("LESS", "<" , self.linha))  
+                    self.tokens.append(Token("LESS", "<" , self.linha))
             elif char == ">":
-                if self.lookAhead() == "=":  
-                    self.nextChar()  
-                    self.tokens.append(Token("GREATEQUAL", ">=" , self.linha))  
+                if self.lookAhead() == "=":
+                    self.nextChar()
+                    self.tokens.append(Token("GREATEQUAL", ">=" , self.linha))
                 else:
-                    self.tokens.append(Token("GREAT", ">" , self.linha))  
+                    self.tokens.append(Token("GREAT", ">" , self.linha))
             elif char.isdigit():
                 self._scan_number()
             elif char.isalpha():
                 self._scan_identifier(keywords)
             else:
                 self.tokens.append(Token("INVALID", char, self.linha))
-                print(f"Caractere Inválido na linha {self.linha}: {char}")
 
     def _match_double_char(self, expected, double_type, single_type):
         if self.lookAhead() == expected:
@@ -86,22 +86,44 @@ class Scanner:
     def _scan_number(self):
         while self.lookAhead().isdigit():
             self.nextChar()
+
         if self.lookAhead() == '.':
             self.nextChar()
             while self.lookAhead().isdigit():
                 self.nextChar()
-        self.tokens.append(Token("NUMBER", self.programa[self.inicio:self.atual], self.linha))
+
+        lexeme = self.programa[self.inicio:self.atual]
+
+        if self.lookAhead().isalpha():
+            while self.lookAhead().isalnum():
+                self.nextChar()
+            lexeme = self.programa[self.inicio:self.atual]
+            self.tokens.append(Token("INVALID", lexeme, self.linha))
+        else:
+            self.tokens.append(Token("NUMBER", lexeme, self.linha))
 
     def _scan_identifier(self, keywords):
-        while self.lookAhead().isalnum():
+        if not (self.programa[self.inicio].isalpha() or self.programa[self.inicio] == '_'):
+            self.tokens.append(Token("INVALID", self.programa[self.inicio:self.atual], self.linha))
+            return
+
+        while self.lookAhead().isalnum() or self.lookAhead() == '_':
             self.nextChar()
+
         lexeme = self.programa[self.inicio:self.atual]
-        
-        token_type = keywords.get(lexeme, "CARACTERE")
-        if lexeme.startswith("v") and token_type == "CARACTERE":
-            token_type = "ID_VAR"
-        elif lexeme.startswith("f") and token_type == "CARACTERE":
-            token_type = "ID_FUNC"
-        elif lexeme.startswith("p") and token_type == "CARACTERE":
-            token_type = "ID_PROC"
-        self.tokens.append(Token(token_type, lexeme, self.linha))
+        if lexeme not in keywords:
+            if lexeme.startswith("v") and lexeme[1:].isalnum(): 
+                self.tokens.append(Token("ID_VAR", lexeme, self.linha))
+                self.symbol_table[lexeme] = "VAR"  # Registrando na tabela de símbolos como variável
+            elif lexeme.startswith("f") and lexeme[1:].isalnum(): 
+                self.tokens.append(Token("ID_FUNC", lexeme, self.linha))
+                self.symbol_table[lexeme] = "VAR" 
+            elif lexeme.startswith("p") and lexeme[1:].isalnum(): 
+                self.tokens.append(Token("ID_PROC", lexeme, self.linha))
+                self.symbol_table[lexeme] = "VAR"
+            else:
+                self.tokens.append(Token("INVALID", lexeme, self.linha))
+        else:
+            token_type = keywords.get(lexeme, "ID")
+            self.tokens.append(Token(token_type, lexeme, self.linha))
+            self.symbol_table[lexeme] = token_type  # Registrando na tabela de símbolos como palavra-chave

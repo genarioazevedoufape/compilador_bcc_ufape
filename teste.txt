@@ -13,7 +13,7 @@ func boolean fEhPar(int vNumero) {
 
 
 func int fMultiplicar(int vNumero) {
-    int vMultiplicado = vNumero * 2;
+    int vMultiplicado = vNumero + 3 - 5 * 4 / 2;
     return vMultiplicado;
 }
 
@@ -30,10 +30,7 @@ while (vX < 10) {
     if (vX == 5) {
         int vX = vX + 1;
         continue;
-    } else {
-        break;
     }
-    int vX = vX + 1;  
 }
 
 int vResultado = fSomar(vA, vB);

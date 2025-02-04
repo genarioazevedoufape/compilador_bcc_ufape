@@ -8,15 +8,19 @@ class Parser:
 
     def match(self, expected_type):
         token = self.current_token()
-        if token and token.tipo == expected_type:
-            print(f"Matched {expected_type}: {token.lexema} na linha {token.linha}")  
-            self.current += 1
-            return token
+        if token:
+            if token.tipo == expected_type:
+                print(f"Matched {expected_type}: {token.lexema} na linha {token.linha}")  
+                self.current += 1
+                return token
+            elif token.tipo == "INVALID":
+                self.error(f"Caractere inválido encontrado: '{token.lexema}'")
         return None
+
     def error(self, message):
         token = self.current_token()
         context = f"Na linha {token.linha} encontrou '{token.lexema}'" if token else "no final da entrada"
-        print(f"Error: {message} {context}")  
+        # print(f"Error: {message} {context}")  
         raise SyntaxError(f"{message} {context}")
 
     def parse(self):
@@ -31,11 +35,6 @@ class Parser:
 
     def bloco(self):
         while self.current_token():
-            token = self.current_token()
-            # Verificar caracteres fora das regras da gramática
-            if token.tipo == "NUMBER" or token.tipo == "CARACTERE":
-                self.error(f"Erro: entrada inválida:'{token.lexema}' encontrado na linha {token.linha}, posição inválida no código.")
-
             if self.declaracao_variavel():
                 continue
             elif self.comando_condicional():
