@@ -2,6 +2,7 @@ class Parser:
     def __init__(self, tokens):
         self.tokens = tokens
         self.current = 0
+        self.loop_depth = 0  # Adicionando contador de contexto de loop
 
     def current_token(self):
         return self.tokens[self.current] if self.current < len(self.tokens) else None
@@ -129,7 +130,9 @@ class Parser:
                 if self.expressao():
                     if self.match("RBRACK"):
                         if self.match("LCBRACK"):
+                            self.loop_depth += 1  # Entrando em um loop
                             if self.bloco():
+                                self.loop_depth -= 1  # Saindo do loop
                                 if self.match("RCBRACK"):
                                     return True
                                 else:
@@ -288,8 +291,10 @@ class Parser:
 
     def desvio_incondicional(self):
         if self.match("BREAK") or self.match("CONTINUE"):
+            if self.loop_depth == 0:
+                self.error("'break' e 'continue' só podem ser usados dentro de loops.")
             if self.match("SEMICOLON"):
                 return True
             else:
                 self.error("Esperado ';' após 'break' ou 'continue'.")
-        return False 
+        return False
