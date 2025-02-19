@@ -3,7 +3,7 @@ from Lexer.Token import Token
 class Scanner:
     def __init__(self, programa):
         self.tokens = []
-        self.symbol_table = {}  # Tabela de símbolos
+        self.symbol_table = {} 
         self.programa = programa
         self.inicio = 0
         self.atual = 0
@@ -114,16 +114,17 @@ class Scanner:
         if lexeme not in keywords:
             if lexeme.startswith("v") and lexeme[1:].isalnum(): 
                 self.tokens.append(Token("ID_VAR", lexeme, self.linha))
-                self.symbol_table[lexeme] = "VAR"  # Registrando na tabela de símbolos como variável
+                # O tipo da variável será definido durante a análise sintática/semântica
+                self.symbol_table[lexeme] = None  # Inicialmente, o tipo é None
             elif lexeme.startswith("f") and lexeme[1:].isalnum(): 
                 self.tokens.append(Token("ID_FUNC", lexeme, self.linha))
-                self.symbol_table[lexeme] = "VAR" 
+                self.symbol_table[lexeme] = "FUNC"  # Identificador de função
             elif lexeme.startswith("p") and lexeme[1:].isalnum(): 
                 self.tokens.append(Token("ID_PROC", lexeme, self.linha))
-                self.symbol_table[lexeme] = "VAR"
+                self.symbol_table[lexeme] = "PROC"  # Identificador de procedimento
             else:
                 self.tokens.append(Token("INVALID", lexeme, self.linha))
         else:
             token_type = keywords.get(lexeme, "ID")
             self.tokens.append(Token(token_type, lexeme, self.linha))
-            self.symbol_table[lexeme] = token_type  # Registrando na tabela de símbolos como palavra-chave
+            # Palavras-chave não são armazenadas na symbol_table

@@ -3,5 +3,6 @@ class Token:
         self.tipo = tipo
         self.lexema = lexema
         self.linha = linha
+
     def __str__(self):
-        return "Tipo: %s\n Lexema: %s\n Linha: %s\n" % (str(self.tipo),str(self.lexema),str(self.linha))
+        return f"Tipo: {self.tipo}\nLexema: {self.lexema}\nLinha: {self.linha}\n"
