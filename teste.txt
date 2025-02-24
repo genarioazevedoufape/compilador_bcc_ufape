@@ -4,23 +4,21 @@ int vX = 0;
 
 
 func int fSomar(int v1, int v2) {
-    return v1 + v2;
+    return v1 + v2; 
 }
 
 func boolean fEhPar(int vNumero) {
-    return vNumero / 2 * 2 == vNumero;
+    return vNumero * 2 / 2 == 0;  
 }
 
-
 func int fMultiplicar(int vNumero) {
-    int vMultiplicado = vNumero + 3 - 5 * 4 / 2;
-    return vMultiplicado;
+    return vNumero * 2;
 }
 
 proc pContador(int vInicio, int vFim) {
     while (vInicio <= vFim) {
         print vInicio;
-        int vInicio = vInicio + 1;
+        vInicio = vInicio + 1;  
     }
 }
 
@@ -28,14 +26,15 @@ pContador(1, 5);
 
 while (vX < 10) {
     if (vX == 5) {
-        int vX = vX + 1;
+        vX = vX + 1;
         continue;
     }
+    vX = vX + 1;
 }
+
 
 int vResultado = fSomar(vA, vB);
 print vResultado;
 
-boolean vPar = fEhPar(vResultado);
-fMultiplicar(vX);
-
+int vResultadoMultiplicacao = fMultiplicar(vX);
+print vResultadoMultiplicacao;

@@ -87,44 +87,29 @@ class Scanner:
         while self.lookAhead().isdigit():
             self.nextChar()
 
-        if self.lookAhead() == '.':
-            self.nextChar()
-            while self.lookAhead().isdigit():
-                self.nextChar()
-
         lexeme = self.programa[self.inicio:self.atual]
-
-        if self.lookAhead().isalpha():
-            while self.lookAhead().isalnum():
-                self.nextChar()
-            lexeme = self.programa[self.inicio:self.atual]
-            self.tokens.append(Token("INVALID", lexeme, self.linha))
-        else:
-            self.tokens.append(Token("NUMBER", lexeme, self.linha))
+        self.tokens.append(Token("NUMBER", lexeme, self.linha))
 
     def _scan_identifier(self, keywords):
-        if not (self.programa[self.inicio].isalpha() or self.programa[self.inicio] == '_'):
-            self.tokens.append(Token("INVALID", self.programa[self.inicio:self.atual], self.linha))
-            return
-
         while self.lookAhead().isalnum() or self.lookAhead() == '_':
             self.nextChar()
 
         lexeme = self.programa[self.inicio:self.atual]
         if lexeme not in keywords:
-            if lexeme.startswith("v") and lexeme[1:].isalnum(): 
-                self.tokens.append(Token("ID_VAR", lexeme, self.linha))
-                # O tipo da variável será definido durante a análise sintática/semântica
-                self.symbol_table[lexeme] = None  # Inicialmente, o tipo é None
-            elif lexeme.startswith("f") and lexeme[1:].isalnum(): 
+            if lexeme.startswith("f"):
                 self.tokens.append(Token("ID_FUNC", lexeme, self.linha))
-                self.symbol_table[lexeme] = "FUNC"  # Identificador de função
-            elif lexeme.startswith("p") and lexeme[1:].isalnum(): 
+            elif lexeme.startswith("p"):
                 self.tokens.append(Token("ID_PROC", lexeme, self.linha))
-                self.symbol_table[lexeme] = "PROC"  # Identificador de procedimento
+            elif lexeme.startswith("v"):
+                self.tokens.append(Token("ID_VAR", lexeme, self.linha))
             else:
                 self.tokens.append(Token("INVALID", lexeme, self.linha))
         else:
-            token_type = keywords.get(lexeme, "ID")
-            self.tokens.append(Token(token_type, lexeme, self.linha))
-            # Palavras-chave não são armazenadas na symbol_table
+            self.tokens.append(Token(keywords[lexeme], lexeme, self.linha))
+
+
+    def print_symbol_table(self):
+        print("=== Tabela de Símbolos ===")
+        for key, value in self.symbol_table.items():
+            print(f"{key}: {value}")
+        print("=========================")

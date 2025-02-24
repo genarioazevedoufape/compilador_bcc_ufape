@@ -1,6 +1,5 @@
 from Lexer.Scanner import Scanner
 from Parser.Parser import Parser
-from Semantic.Semantic_analyzer import SemanticAnalyzer
 
 def Main():
     try:
@@ -35,16 +34,7 @@ def Main():
     except SyntaxError as e:
         print(f"Erro de sintaxe: {e}")
         return 
-    
-    symbol_table = scanner.symbol_table  # Passando a tabela de símbolos para a análise semântica
-    analyzer = SemanticAnalyzer(tokens, symbol_table)
 
-    try:
-        analyzer.analyze()
-        print("\nAnálise Semântica concluída com sucesso!")
-    except ValueError as e:
-        print(f"Erro Semântico: {e}")
-        return
 
 if __name__ == "__main__":
     Main()
