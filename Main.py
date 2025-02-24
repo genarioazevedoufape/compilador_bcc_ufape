@@ -1,5 +1,5 @@
-from Lexer.Scanner import Scanner
-from Parser.Parser import Parser
+from lexer.scanner import Scanner
+from parser.parser import Parser
 
 def Main():
     try:

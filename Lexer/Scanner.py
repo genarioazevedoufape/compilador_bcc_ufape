@@ -1,4 +1,4 @@
-from Lexer.Token import Token
+from lexer.token import Token
 
 class Scanner:
     def __init__(self, programa):
