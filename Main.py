@@ -30,11 +30,12 @@ def Main():
 
     try:
         parser.parse()
-        print("\nAnálise Sintática concluída com sucesso!")
     except SyntaxError as e:
         print(f"Erro de sintaxe: {e}")
-        return 
-
+        return  
+    except Exception as e:  # Captura erros semânticos, caso existam
+        print(f"Erro semântico: {e}")
+        return  
 
 if __name__ == "__main__":
     Main()

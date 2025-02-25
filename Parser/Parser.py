@@ -23,14 +23,20 @@ class Parser:
             self.current += 1
             return token
         elif token and token.tipo == "INVALID":
-            self.error(f"Caractere inválido encontrado: '{token.lexema}'")
+            self.error_sintatico(f"Caractere inválido encontrado: '{token.lexema}'")
         return None
 
-    def error(self, message):
+    def error_sintatico(self, message):
         """Gera um erro de sintaxe com contexto."""
         token = self.current_token()
         context = f"Na linha {token.linha} encontrou '{token.lexema}'" if token else "no final da entrada"
-        raise SyntaxError(f"{message} {context}")
+        raise SyntaxError(f"[Erro Sintático] {message} {context}")
+
+    def error_semantico(self, message):
+        """Gera um erro semântico com contexto."""
+        token = self.current_token()
+        context = f"Na linha {token.linha} encontrou '{token.lexema}'" if token else "no final da entrada"
+        raise ValueError(f"[Erro Semântico] {message} {context}")
 
     def enter_scope(self):
         """Entra em um novo escopo."""
@@ -44,7 +50,7 @@ class Parser:
     def add_symbol(self, name, symbol_type):
         """Adiciona um símbolo ao escopo atual."""
         if name in self.scope_stack[-1]:
-            self.error(f"Identificador '{name}' já declarado no escopo atual.")
+            self.error_semantico(f"Identificador '{name}' já declarado no escopo atual.")
         self.scope_stack[-1][name] = {"type": symbol_type}
 
     def get_symbol_type(self, name):
@@ -52,7 +58,7 @@ class Parser:
         for scope in reversed(self.scope_stack):
             if name in scope:
                 return scope[name]["type"]
-        self.error(f"Identificador '{name}' não declarado.")
+        self.error_semantico(f"Identificador '{name}' não declarado.")
 
     def parse(self):
         """Inicia o processo de parsing."""
@@ -98,11 +104,10 @@ class Parser:
         if not tipo:
             token = self.current_token()
             if token and token.tipo == "ID_VAR":
-                # Se não houver especificador de tipo, verifica se é uma atribuição
                 if self.peek() and self.peek().tipo == "ATTR":
                     return self.atribuicao_variavel()
                 else:
-                    self.error(f"Declaração de variável '{token.lexema}' na linha {token.linha} não é antecedida por um especificador de tipo.")
+                    self.erro_semantico(f"Declaração de variável '{token.lexema}' na linha {token.linha} não é antecedida por um especificador de tipo.")
             return False
 
         if self.match("ID_VAR"):
@@ -112,17 +117,17 @@ class Parser:
             if self.match("ATTR"):
                 expr_type = self.expressao()
                 if expr_type != tipo:
-                    self.error(f"Atribuição inválida: esperado '{tipo}', encontrado '{expr_type}'.")
+                    self.erro_semantico(f"Atribuição inválida: esperado '{tipo}', encontrado '{expr_type}'.")
                 if self.match("SEMICOLON"):
                     return True
                 else:
-                    self.error("Esperado ';' após a atribuição da variável.")
+                    self.error_sintatico("Esperado ';' após a atribuição da variável.")
             elif self.match("SEMICOLON"):
                 return True
             else:
-                self.error("Esperado ';' após o identificador da variável.")
+                self.error_sintatico("Esperado ';' após o identificador da variável.")
         else:
-            self.error("Esperado identificador de variável.")
+            self.error_sintatico("Esperado identificador de variável.")
         return False
 
     def atribuicao_variavel(self):
@@ -134,14 +139,15 @@ class Parser:
         if self.match("ATTR"):
             expr_type = self.expressao()
             if expr_type != var_type:
-                self.error(f"Atribuição inválida: esperado '{var_type}', encontrado '{expr_type}'.")
+                self.erro_semantico(f"Atribuição inválida: esperado '{var_type}', encontrado '{expr_type}'.")
             if self.match("SEMICOLON"):
                 return True
             else:
-                self.error("Esperado ';' após a atribuição da variável.")
+                self.error_sintatico("Esperado ';' após a atribuição da variável.")
         else:
-            self.error("Esperado '=' após o identificador da variável.")
+            self.error_sintatico("Esperado '=' após o identificador da variável.")
         return False
+
     def especificador_tipo(self):
         """Processa o tipo de uma variável."""
         if self.match("TYPE_INT"):
@@ -156,7 +162,7 @@ class Parser:
             if self.match("LBRACK"):
                 expr_type = self.expressao()
                 if expr_type != "boolean":
-                    self.error(f"Condição do 'if' deve ser do tipo 'boolean', encontrado '{expr_type}'.")
+                    self.error_semantico(f"Condição do 'if' deve ser do tipo 'boolean', encontrado '{expr_type}'.")
                 if self.match("RBRACK"):
                     if self.match("LCBRACK"):
                         if self.bloco():
@@ -164,15 +170,15 @@ class Parser:
                                 self.else_opcional()
                                 return True
                             else:
-                                self.error("Esperado '}' para fechar o bloco do 'if'.")
+                                self.error_sintatico("Esperado '}' para fechar o bloco do 'if'.")
                         else:
-                            self.error("Bloco do 'if' inválido.")
+                            self.error_sintatico("Bloco do 'if' inválido.")
                     else:
-                        self.error("Esperado '{' para iniciar o bloco do 'if'.")
+                        self.error_sintatico("Esperado '{' para iniciar o bloco do 'if'.")
                 else:
-                    self.error("Esperado ')' para fechar a condição do 'if'.")
+                    self.error_sintatico("Esperado ')' para fechar a condição do 'if'.")
             else:
-                self.error("Esperado '(' para abrir a condição do 'if'.")
+                self.error_sintatico("Esperado '(' para abrir a condição do 'if'.")
         return False
 
     def else_opcional(self):
@@ -181,11 +187,11 @@ class Parser:
             if self.match("LCBRACK"):
                 if self.bloco():
                     if not self.match("RCBRACK"):
-                        self.error("Esperado '}' para fechar o bloco do 'else'.")
+                        self.error_sintatico("Esperado '}' para fechar o bloco do 'else'.")
                 else:
-                    self.error("Bloco do 'else' inválido.")
+                    self.error_sintatico("Bloco do 'else' inválido.")
             else:
-                self.error("Esperado '{' para abrir o bloco do 'else'.")
+                self.error_sintatico("Esperado '{' para abrir o bloco do 'else'.")
         return True
 
     def comando_enquanto(self):
@@ -194,7 +200,7 @@ class Parser:
             if self.match("LBRACK"):
                 expr_type = self.expressao()
                 if expr_type != "boolean":
-                    self.error(f"Condição do 'while' deve ser do tipo 'boolean', encontrado '{expr_type}'.")
+                    self.error_semantico(f"Condição do 'while' deve ser do tipo 'boolean', encontrado '{expr_type}'.")
                 if self.match("RBRACK"):
                     if self.match("LCBRACK"):
                         self.loop_depth += 1
@@ -203,15 +209,15 @@ class Parser:
                             if self.match("RCBRACK"):
                                 return True
                             else:
-                                self.error("Esperado '}' para fechar o bloco do 'while'.")
+                                self.error_sintatico("Esperado '}' para fechar o bloco do 'while'.")
                         else:
-                            self.error("Bloco do 'while' inválido.")
+                            self.error_sintatico("Bloco do 'while' inválido.")
                     else:
-                        self.error("Esperado '{' para iniciar o bloco do 'while'.")
+                        self.error_sintatico("Esperado '{' para iniciar o bloco do 'while'.")
                 else:
-                    self.error("Esperado ')' para fechar a condição do 'while'.")
+                    self.error_sintatico("Esperado ')' para fechar a condição do 'while'.")
             else:
-                self.error("Esperado '(' para abrir a condição do 'while'.")
+                self.error_sintatico("Esperado '(' para abrir a condição do 'while'.")
         return False
 
     def comando_impressao(self):
@@ -219,11 +225,11 @@ class Parser:
         if self.match("PRINT"):
             expr_type = self.expressao()
             if expr_type not in ["int", "boolean"]:
-                self.error(f"Tipo inválido para impressão: '{expr_type}'.")
+                self.error_semantico(f"Tipo inválido para impressão: '{expr_type}'.")
             if self.match("SEMICOLON"):
                 return True
             else:
-                self.error("Esperado ';' após o comando 'print'.")
+                self.error_sintatico("Esperado ';' após o comando 'print'.")
         return False
 
     def declaracao_funcao(self):
@@ -231,7 +237,7 @@ class Parser:
         if self.match("FUNC"):
             return_type = self.especificador_tipo()
             if not return_type:
-                self.error("Esperado tipo de retorno da função.")
+                self.error_sintatico("Esperado tipo de retorno da função.")
             
             if self.match("ID_FUNC"):
                 func_name = self.tokens[self.current - 1].lexema
@@ -246,29 +252,29 @@ class Parser:
                                     if self.match("RETURN"):
                                         expr_type = self.expressao()
                                         if expr_type != return_type:
-                                            self.error(f"Tipo de retorno inválido: esperado '{return_type}', encontrado '{expr_type}'.")
+                                            self.error_semantico(f"Tipo de retorno inválido: esperado '{return_type}', encontrado '{expr_type}'.")
                                         if self.match("SEMICOLON"):
                                             if self.match("RCBRACK"):
                                                 self.exit_scope()  # Sai do escopo da função
                                                 return True
                                             else:
-                                                self.error("Esperado '}' para fechar o corpo da função.")
+                                                self.error_sintatico("Esperado '}' para fechar o corpo da função.")
                                         else:
-                                            self.error("Esperado ';' após o retorno da função.")
+                                            self.error_sintatico("Esperado ';' após o retorno da função.")
                                     else:
-                                        self.error("Esperado 'return' no corpo da função.")
+                                        self.error_sintatico("Esperado 'return' no corpo da função.")
                                 else:
-                                    self.error("Bloco da função inválido.")
+                                    self.error_sintatico("Bloco da função inválido.")
                             else:
-                                self.error("Esperado '{' para iniciar o corpo da função.")
+                                self.error_sintatico("Esperado '{' para iniciar o corpo da função.")
                         else:
-                            self.error("Esperado ')' para fechar a lista de parâmetros.")
+                            self.error_sintatico("Esperado ')' para fechar a lista de parâmetros.")
                     else:
-                        self.error("Lista de parâmetros inválida.")
+                        self.error_sintatico("Lista de parâmetros inválida.")
                 else:
-                    self.error("Esperado '(' para iniciar a lista de parâmetros.")
+                    self.error_sintatico("Esperado '(' para iniciar a lista de parâmetros.")
             else:
-                self.error("Esperado identificador da função.")
+                self.error_sintatico("Esperado identificador da função.")
         return False
 
     def lista_parametros(self):
@@ -279,7 +285,7 @@ class Parser:
         if self.declaracao_parametro():
             while self.match("COMMA"):
                 if not self.declaracao_parametro():
-                    self.error("Esperado parâmetro após ','.")
+                    self.error_sintatico("Esperado parâmetro após ','.")
             return True
         return False
 
@@ -287,7 +293,7 @@ class Parser:
         """Processa a declaração de um parâmetro."""
         tipo = self.especificador_tipo()
         if not tipo:
-            self.error("Esperado tipo do parâmetro.")
+            self.error_sintatico("Esperado tipo do parâmetro.")
         
         if self.match("ID_VAR"):
             param_name = self.tokens[self.current - 1].lexema
@@ -307,7 +313,7 @@ class Parser:
             self.match(token.tipo)
             right_type = self.expressao_aditiva()
             if left_type != right_type:
-                self.error(f"Tipos incompatíveis na expressão: '{left_type}' e '{right_type}'.")
+                self.error_semantico(f"Tipos incompatíveis na expressão: '{left_type}' e '{right_type}'.")
             return "boolean"
         return left_type
 
@@ -319,7 +325,7 @@ class Parser:
             self.match(token.tipo)
             right_type = self.expressao_multiplicativa()
             if left_type != right_type:
-                self.error(f"Tipos incompatíveis na expressão: '{left_type}' e '{right_type}'.")
+                self.error_semantico(f"Tipos incompatíveis na expressão: '{left_type}' e '{right_type}'.")
             left_type = "int"  # O resultado de uma operação aditiva é sempre int
             token = self.current_token()
         return left_type
@@ -332,7 +338,7 @@ class Parser:
             self.match(token.tipo)
             right_type = self.termo()
             if left_type != right_type:
-                self.error(f"Tipos incompatíveis na expressão: '{left_type}' e '{right_type}'.")
+                self.error_semantico(f"Tipos incompatíveis na expressão: '{left_type}' e '{right_type}'.")
             left_type = "int"  # O resultado de uma operação multiplicativa é sempre int
             token = self.current_token()
         return left_type
@@ -354,7 +360,7 @@ class Parser:
         elif self.chamada_funcao():
             return self.function_return_type
         else:
-            self.error(f"Esperado número, variável ou chamada de função, encontrado '{token.lexema}'.")
+            self.error_sintatico(f"Esperado número, variável ou chamada de função, encontrado '{token.lexema}'.")
 
     def chamada_funcao(self):
         """Processa uma chamada de função."""
@@ -364,9 +370,9 @@ class Parser:
                     if self.match("RBRACK"):
                         return True
                 else:
-                    self.error("Argumentos inválidos na chamada da função.")
+                    self.error_sintatico("Argumentos inválidos na chamada da função.")
             else:
-                self.error("Esperado '(' para iniciar a chamada da função.")
+                self.error_sintatico("Esperado '(' para iniciar a chamada da função.")
         return False
 
     def lista_argumentos(self):
@@ -377,7 +383,7 @@ class Parser:
         if self.expressao():
             while self.match("COMMA"):
                 if not self.expressao():
-                    self.error("Esperado expressão após ','.")
+                    self.error_sintatico("Esperado expressão após ','.")
             return True
         return False
 
@@ -397,19 +403,19 @@ class Parser:
                                         self.exit_scope()  # Sai do escopo do procedimento
                                         return True
                                     else:
-                                        self.error("Esperado '}' para fechar o corpo do procedimento.")
+                                        self.error_sintatico("Esperado '}' para fechar o corpo do procedimento.")
                                 else:
-                                    self.error("Bloco do procedimento inválido.")
+                                    self.error_sintatico("Bloco do procedimento inválido.")
                             else:
-                                self.error("Esperado '{' para iniciar o corpo do procedimento.")
+                                self.error_sintatico("Esperado '{' para iniciar o corpo do procedimento.")
                         else:
-                            self.error("Esperado ')' para fechar a lista de parâmetros.")
+                            self.error_sintatico("Esperado ')' para fechar a lista de parâmetros.")
                     else:
-                        self.error("Lista de parâmetros inválida.")
+                        self.error_sintatico("Lista de parâmetros inválida.")
                 else:
-                    self.error("Esperado '(' para iniciar a lista de parâmetros.")
+                    self.error_sintatico("Esperado '(' para iniciar a lista de parâmetros.")
             else:
-                self.error("Esperado identificador do procedimento.")
+                self.error_sintatico("Esperado identificador do procedimento.")
         return False
 
     def chamada_procedimento(self):
@@ -421,22 +427,22 @@ class Parser:
                         if self.match("SEMICOLON"):
                             return True
                         else:
-                            self.error("Esperado ';' após a chamada do procedimento.")
+                            self.error_sintatico("Esperado ';' após a chamada do procedimento.")
                     else:
-                        self.error("Esperado ')' para fechar os argumentos do procedimento.")
+                        self.error_sintatico("Esperado ')' para fechar os argumentos do procedimento.")
                 else:
-                    self.error("Argumentos inválidos na chamada do procedimento.")
+                    self.error_sintatico("Argumentos inválidos na chamada do procedimento.")
             else:
-                self.error("Esperado '(' para iniciar os argumentos do procedimento.")
+                self.error_sintatico("Esperado '(' para iniciar os argumentos do procedimento.")
         return False
 
     def desvio_incondicional(self):
         """Processa comandos de desvio incondicional (break, continue)."""
         if self.match("BREAK") or self.match("CONTINUE"):
             if self.loop_depth == 0:
-                self.error("'break' e 'continue' só podem ser usados dentro de loops.")
+                self.error_sintatico("'break' e 'continue' só podem ser usados dentro de loops.")
             if self.match("SEMICOLON"):
                 return True
             else:
-                self.error("Esperado ';' após 'break' ou 'continue'.")
+                self.error_sintatico("Esperado ';' após 'break' ou 'continue'.")
         return False

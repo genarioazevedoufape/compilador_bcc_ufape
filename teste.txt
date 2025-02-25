@@ -32,8 +32,7 @@ while (vX < 10) {
     vX = vX + 1;
 }
 
-
-int vResultado = fSomar(vA, vB);
+int vResultado = fSomar(vA, vB, vV);
 print vResultado;
 
 int vResultadoMultiplicacao = fMultiplicar(vX);
