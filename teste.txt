@@ -8,7 +8,7 @@ func int fSomar(int v1, int v2) {
 }
 
 func boolean fEhPar(int vNumero) {
-    return vNumero * 2 / 2 == 0;  
+    return vNumero % 2 == 0;  
 }
 
 func int fMultiplicar(int vNumero) {
@@ -32,7 +32,7 @@ while (vX < 10) {
     vX = vX + 1;
 }
 
-int vResultado = fSomar(vA, vB, vV);
+int vResultado = fSomar(vA, vB);
 print vResultado;
 
 int vResultadoMultiplicacao = fMultiplicar(vX);

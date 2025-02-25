@@ -36,7 +36,7 @@ class Scanner:
         tokens_map = {
             '(': "LBRACK", ')': "RBRACK", '{': "LCBRACK", '}': "RCBRACK",
             ';': "SEMICOLON", ',': "COMMA", '+': "SUM", '-': "SUB",
-            '*': "MUL", '/': "DIV"
+            '*': "MUL", '/': "DIV", '%': "MOD"
         }
 
         while self.atual < len(self.programa):
