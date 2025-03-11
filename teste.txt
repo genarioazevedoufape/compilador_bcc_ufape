@@ -37,3 +37,5 @@ print vResultado;
 
 int vResultadoMultiplicacao = fMultiplicar(vX);
 print vResultadoMultiplicacao;
+
+fSomar(10, 10);

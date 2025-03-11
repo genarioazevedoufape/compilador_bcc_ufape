@@ -5,6 +5,8 @@ class Parser:
         self.loop_depth = 0  # Contador de contexto de loop
         self.scope_stack = [{}]  # Pilha de escopos (inicia com o escopo global)
         self.function_return_type = None  # Tipo de retorno da função atual
+        self.procedure_params = {}  # Dicionário para mapear procedimentos e seus parâmetros
+        self.function_params = {}  # Dicionário para mapear funções e seus parâmetros
 
     def current_token(self):
         return self.tokens[self.current] if self.current < len(self.tokens) else None
@@ -245,32 +247,31 @@ class Parser:
                 self.enter_scope()  # Entra no escopo da função
 
                 if self.match("LBRACK"):
-                    if self.lista_parametros():
-                        if self.match("RBRACK"):
-                            if self.match("LCBRACK"):
-                                if self.bloco():
-                                    if self.match("RETURN"):
-                                        expr_type = self.expressao()
-                                        if expr_type != return_type:
-                                            self.error_semantico(f"Tipo de retorno inválido: esperado '{return_type}', encontrado '{expr_type}'.")
-                                        if self.match("SEMICOLON"):
-                                            if self.match("RCBRACK"):
-                                                self.exit_scope()  # Sai do escopo da função
-                                                return True
-                                            else:
-                                                self.error_sintatico("Esperado '}' para fechar o corpo da função.")
+                    params = self.lista_parametros()
+                    self.function_params[func_name] = [param["type"] for param in params]  # Armazena os parâmetros
+                    if self.match("RBRACK"):
+                        if self.match("LCBRACK"):
+                            if self.bloco():
+                                if self.match("RETURN"):
+                                    expr_type = self.expressao()
+                                    if expr_type != return_type:
+                                        self.error_semantico(f"Tipo de retorno inválido: esperado '{return_type}', encontrado '{expr_type}'.")
+                                    if self.match("SEMICOLON"):
+                                        if self.match("RCBRACK"):
+                                            self.exit_scope()  # Sai do escopo da função
+                                            return True
                                         else:
-                                            self.error_sintatico("Esperado ';' após o retorno da função.")
+                                            self.error_sintatico("Esperado '}' para fechar o corpo da função.")
                                     else:
-                                        self.error_sintatico("Esperado 'return' no corpo da função.")
+                                        self.error_sintatico("Esperado ';' após o retorno da função.")
                                 else:
-                                    self.error_sintatico("Bloco da função inválido.")
+                                    self.error_sintatico("Esperado 'return' no corpo da função.")
                             else:
-                                self.error_sintatico("Esperado '{' para iniciar o corpo da função.")
+                                self.error_sintatico("Bloco da função inválido.")
                         else:
-                            self.error_sintatico("Esperado ')' para fechar a lista de parâmetros.")
+                            self.error_sintatico("Esperado '{' para iniciar o corpo da função.")
                     else:
-                        self.error_sintatico("Lista de parâmetros inválida.")
+                        self.error_sintatico("Esperado ')' para fechar a lista de parâmetros.")
                 else:
                     self.error_sintatico("Esperado '(' para iniciar a lista de parâmetros.")
             else:
@@ -278,16 +279,33 @@ class Parser:
         return False
 
     def lista_parametros(self):
-        """Processa a lista de parâmetros de uma função."""
+        """Processa a lista de parâmetros de uma função e retorna uma lista de tipos."""
+        params = []
         if self.match("RBRACK"):  # Caso não haja parâmetros
-            return True
+            return params
         
-        if self.declaracao_parametro():
+        tipo = self.especificador_tipo()
+        if not tipo:
+            self.error_sintatico("Esperado tipo do parâmetro.")
+        
+        if self.match("ID_VAR"):
+            param_name = self.tokens[self.current - 1].lexema
+            self.add_symbol(param_name, tipo)
+            params.append({"type": tipo})
+            
             while self.match("COMMA"):
-                if not self.declaracao_parametro():
-                    self.error_sintatico("Esperado parâmetro após ','.")
-            return True
-        return False
+                tipo = self.especificador_tipo()
+                if not tipo:
+                    self.error_sintatico("Esperado tipo do parâmetro.")
+                
+                if self.match("ID_VAR"):
+                    param_name = self.tokens[self.current - 1].lexema
+                    self.add_symbol(param_name, tipo)
+                    params.append({"type": tipo})
+                else:
+                    self.error_sintatico("Esperado identificador do parâmetro.")
+        
+        return params
 
     def declaracao_parametro(self):
         """Processa a declaração de um parâmetro."""
@@ -324,8 +342,8 @@ class Parser:
         while token and token.tipo in ["SUM", "SUB"]:
             self.match(token.tipo)
             right_type = self.expressao_multiplicativa()
-            if left_type != right_type:
-                self.error_semantico(f"Tipos incompatíveis na expressão: '{left_type}' e '{right_type}'.")
+            if left_type != "int" or right_type != "int":
+                self.error_semantico(f"Operação aritmética requer operandos do tipo 'int', encontrado '{left_type}' e '{right_type}'.")
             left_type = "int"  # O resultado de uma operação aditiva é sempre int
             token = self.current_token()
         return left_type
@@ -337,8 +355,8 @@ class Parser:
         while token and token.tipo in ["MUL", "DIV", "MOD"]:
             self.match(token.tipo)
             right_type = self.termo()
-            if left_type != right_type:
-                self.error_semantico(f"Tipos incompatíveis na expressão: '{left_type}' e '{right_type}'.")
+            if left_type != "int" or right_type != "int":
+                self.error_semantico(f"Operação multiplicativa requer operandos do tipo 'int', encontrado '{left_type}' e '{right_type}'.")
             left_type = "int"  # O resultado de uma operação multiplicativa é sempre int
             token = self.current_token()
         return left_type
@@ -365,27 +383,36 @@ class Parser:
     def chamada_funcao(self):
         """Processa uma chamada de função."""
         if self.match("ID_FUNC"):
+            func_name = self.tokens[self.current - 1].lexema
             if self.match("LBRACK"):
-                if self.lista_argumentos():
-                    if self.match("RBRACK"):
-                        return True
+                # Verifica o número e tipos dos argumentos
+                expected_params = self.get_function_params(func_name)
+                actual_args = self.lista_argumentos()
+                if len(actual_args) != len(expected_params):
+                    self.error_semantico(f"Número incorreto de argumentos para a função '{func_name}'. Esperado {len(expected_params)}, encontrado {len(actual_args)}.")
+                for i, (arg_type, param_type) in enumerate(zip(actual_args, expected_params)):
+                    if arg_type != param_type:
+                        self.error_semantico(f"Tipo incorreto para o argumento {i + 1} na função '{func_name}'. Esperado '{param_type}', encontrado '{arg_type}'.")
+                if self.match("RBRACK"):
+                    return True
                 else:
-                    self.error_sintatico("Argumentos inválidos na chamada da função.")
+                    self.error_sintatico("Esperado ')' para fechar a chamada da função.")
             else:
                 self.error_sintatico("Esperado '(' para iniciar a chamada da função.")
         return False
 
     def lista_argumentos(self):
-        """Processa a lista de argumentos de uma função."""
+        """Processa a lista de argumentos de uma função e retorna uma lista de tipos."""
         if self.match("RBRACK"):  # Caso não haja argumentos
-            return True
+            return []
         
-        if self.expressao():
-            while self.match("COMMA"):
-                if not self.expressao():
-                    self.error_sintatico("Esperado expressão após ','.")
-            return True
-        return False
+        args = []
+        expr_type = self.expressao()
+        args.append(expr_type)
+        while self.match("COMMA"):
+            expr_type = self.expressao()
+            args.append(expr_type)
+        return args
 
     def declaracao_procedimento(self):
         """Processa a declaração de um procedimento."""
@@ -395,23 +422,22 @@ class Parser:
                 self.enter_scope()  # Entra no escopo do procedimento
 
                 if self.match("LBRACK"):
-                    if self.lista_parametros():
-                        if self.match("RBRACK"):
-                            if self.match("LCBRACK"):
-                                if self.bloco():
-                                    if self.match("RCBRACK"):
-                                        self.exit_scope()  # Sai do escopo do procedimento
-                                        return True
-                                    else:
-                                        self.error_sintatico("Esperado '}' para fechar o corpo do procedimento.")
+                    params = self.lista_parametros()
+                    self.procedure_params[proc_name] = [param["type"] for param in params]  # Armazena os tipos dos parâmetros
+                    if self.match("RBRACK"):
+                        if self.match("LCBRACK"):
+                            if self.bloco():
+                                if self.match("RCBRACK"):
+                                    self.exit_scope()  # Sai do escopo do procedimento
+                                    return True
                                 else:
-                                    self.error_sintatico("Bloco do procedimento inválido.")
+                                    self.error_sintatico("Esperado '}' para fechar o corpo do procedimento.")
                             else:
-                                self.error_sintatico("Esperado '{' para iniciar o corpo do procedimento.")
+                                self.error_sintatico("Bloco do procedimento inválido.")
                         else:
-                            self.error_sintatico("Esperado ')' para fechar a lista de parâmetros.")
+                            self.error_sintatico("Esperado '{' para iniciar o corpo do procedimento.")
                     else:
-                        self.error_sintatico("Lista de parâmetros inválida.")
+                        self.error_sintatico("Esperado ')' para fechar a lista de parâmetros.")
                 else:
                     self.error_sintatico("Esperado '(' para iniciar a lista de parâmetros.")
             else:
@@ -421,17 +447,23 @@ class Parser:
     def chamada_procedimento(self):
         """Processa uma chamada de procedimento."""
         if self.match("ID_PROC"):
+            proc_name = self.tokens[self.current - 1].lexema
             if self.match("LBRACK"):
-                if self.lista_argumentos():
-                    if self.match("RBRACK"):
-                        if self.match("SEMICOLON"):
-                            return True
-                        else:
-                            self.error_sintatico("Esperado ';' após a chamada do procedimento.")
+                # Verifica o número e tipos dos argumentos
+                expected_params = self.get_procedure_params(proc_name)
+                actual_args = self.lista_argumentos()
+                if len(actual_args) != len(expected_params):
+                    self.error_semantico(f"Número incorreto de argumentos para o procedimento '{proc_name}'. Esperado {len(expected_params)}, encontrado {len(actual_args)}.")
+                for i, (arg_type, param_type) in enumerate(zip(actual_args, expected_params)):
+                    if arg_type != param_type:
+                        self.error_semantico(f"Tipo incorreto para o argumento {i + 1} no procedimento '{proc_name}'. Esperado '{param_type}', encontrado '{arg_type}'.")
+                if self.match("RBRACK"):
+                    if self.match("SEMICOLON"):
+                        return True
                     else:
-                        self.error_sintatico("Esperado ')' para fechar os argumentos do procedimento.")
+                        self.error_sintatico("Esperado ';' após a chamada do procedimento.")
                 else:
-                    self.error_sintatico("Argumentos inválidos na chamada do procedimento.")
+                    self.error_sintatico("Esperado ')' para fechar os argumentos do procedimento.")
             else:
                 self.error_sintatico("Esperado '(' para iniciar os argumentos do procedimento.")
         return False
@@ -446,3 +478,18 @@ class Parser:
             else:
                 self.error_sintatico("Esperado ';' após 'break' ou 'continue'.")
         return False
+    
+
+    def get_procedure_params(self, proc_name):
+        """Retorna uma lista com os tipos dos parâmetros do procedimento."""
+        if proc_name in self.procedure_params:
+            return self.procedure_params[proc_name]
+        self.error_semantico(f"Procedimento '{proc_name}' não declarado.")
+        return []
+
+    def get_function_params(self, func_name):
+        """Retorna uma lista com os tipos dos parâmetros da função."""
+        if func_name in self.function_params:
+            return self.function_params[func_name]
+        self.error_semantico(f"Função '{func_name}' não declarada.")
+        return []
