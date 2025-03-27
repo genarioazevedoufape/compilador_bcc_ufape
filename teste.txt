@@ -1,14 +1,15 @@
 int vA = 7;
 int vB = 15;
 int vX = 0;
-
+boolean vFlag = true;
+boolean vOutroFlag = false;
 
 func int fSomar(int v1, int v2) {
-    return v1 + v2; 
+    return v1 + v2;
 }
 
 func boolean fEhPar(int vNumero) {
-    return vNumero % 2 == 0;  
+    return vNumero % 2 == 0;
 }
 
 func int fMultiplicar(int vNumero) {
@@ -18,7 +19,7 @@ func int fMultiplicar(int vNumero) {
 proc pContador(int vInicio, int vFim) {
     while (vInicio <= vFim) {
         print vInicio;
-        vInicio = vInicio + 1;  
+        vInicio = vInicio + 1;
     }
 }
 
@@ -39,3 +40,29 @@ int vResultadoMultiplicacao = fMultiplicar(vX);
 print vResultadoMultiplicacao;
 
 fSomar(10, 10);
+
+if (vA == vB) {
+    print true;
+} else {
+    print false;
+}
+
+func int fTesteRetorno(int vx) {
+    if (vx > 0) {
+        return vx * 2;
+    }
+    else {
+        return vx * 3;
+    }
+}
+
+
+func int fParametros(int vF, boolean vG) {
+    if (vG) {
+        return vF * 2;
+    }
+    return vF;
+}
+
+print fParametros(10, true);
+

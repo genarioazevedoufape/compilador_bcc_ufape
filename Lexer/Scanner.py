@@ -1,16 +1,15 @@
-from lexer.token import Token
+from Lexer.Token import Token
 
 class Scanner:
     def __init__(self, programa):
         self.tokens = []
-        self.symbol_table = {} 
         self.programa = programa
         self.inicio = 0
         self.atual = 0
         self.linha = 1
 
     def __str__(self):
-        return f"Tokens: {self.tokens}, Symbol Table: {self.symbol_table}, Inicio: {self.inicio}, Atual: {self.atual}, Linha: {self.linha}"
+        return f"Tokens: {self.tokens}, Inicio: {self.inicio}, Atual: {self.atual}, Linha: {self.linha}"
 
     def nextChar(self):
         self.atual += 1
@@ -106,10 +105,3 @@ class Scanner:
                 self.tokens.append(Token("INVALID", lexeme, self.linha))
         else:
             self.tokens.append(Token(keywords[lexeme], lexeme, self.linha))
-
-
-    def print_symbol_table(self):
-        print("=== Tabela de Símbolos ===")
-        for key, value in self.symbol_table.items():
-            print(f"{key}: {value}")
-        print("=========================")
