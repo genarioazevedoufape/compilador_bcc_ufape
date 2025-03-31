@@ -1,0 +1,88 @@
+   1: t1 = 7
+   2: vA = t1
+   3: t2 = 15
+   4: vB = t2
+   5: t3 = 0
+   6: vX = t3
+   7:     t4 = v1 + v2
+   8:     return t4
+   9:     t5 = 2
+  10:     t6 = vNumero % t5
+  11:     t7 = 0
+  12:     t8 = t6 == t7
+  13:     return t8
+  14:     t9 = 2
+  15:     t10 = vNumero * t9
+  16:     return t10
+  17:     L1:
+  18:     t11 = vInicio <= vFim
+  19:     ifFalse t11 goto L3
+  20:         L2:
+  21:         // Bloco do while
+  22:         print vInicio
+  23:         t12 = 1
+  24:         t13 = vInicio + t12
+  25:         vInicio = t13
+  26:     goto L1
+  27:     L3:
+  28: t14 = 1
+  29: t15 = 5
+  30: L4:
+  31: t16 = 10
+  32: t17 = vX < t16
+  33: ifFalse t17 goto L6
+  34:     L5:
+  35:     // Bloco do while
+  36:     t18 = 5
+  37:     t19 = vX == t18
+  38:     ifFalse t19 goto L7
+  39:     // Bloco do if
+  40:     t20 = 1
+  41:     t21 = vX + t20
+  42:     vX = t21
+  43:     goto L8
+  44:     L7:
+  45:     L8:
+  46:     t22 = 1
+  47:     t23 = vX + t22
+  48:     vX = t23
+  49: goto L4
+  50: L6:
+  51: t24 = call fSomar, vA, vB
+  52: vResultado = t24
+  53: print vResultado
+  54: t25 = call fMultiplicar, vX
+  55: vResultadoMultiplicacao = t25
+  56: print vResultadoMultiplicacao
+  57: t26 = 10
+  58: t27 = 10
+  59: t28 = call fSomar, t26, t27
+  60: t29 = vA == vB
+  61: ifFalse t29 goto L9
+  62: // Bloco do if
+  63: t30 = true
+  64: print t30
+  65: goto L10
+  66: L9:
+  67: // Bloco do else
+  68: t31 = false
+  69: print t31
+  70: L10:
+  71:     t32 = 0
+  72:     t33 = vx > t32
+  73:     ifFalse t33 goto L11
+  74:     t34 = 2
+  75:     t35 = vx * t34
+  76:     return t35
+  77:     t36 = 3
+  78:     t37 = vx * t36
+  79:     return t37
+  80:     ifFalse vG goto L13
+  81:     t38 = 2
+  82:     t39 = vF * t38
+  83:     return t39
+  84:     return vF
+  85: t40 = 10
+  86: t41 = true
+  87: t42 = call fParametros, t40, t41
+  88: print t42

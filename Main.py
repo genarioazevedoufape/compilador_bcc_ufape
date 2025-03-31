@@ -29,24 +29,24 @@ def Main():
     parser = Parser(tokens)
 
     try:
-        three_address_code = parser.parse()
+        parser = Parser(tokens)
+        success = parser.parse()
         
-        if three_address_code is not None:
-            print("\n=== Código de Três Endereços Gerado ===")
-            for instruction in three_address_code:
-                print(instruction)
-            print("=======================================")
+        if success:
+            print("\n=== Código de Três Endereços Otimizado ===")
+            formatted_code = parser.get_formatted_code()
+            print(formatted_code)
             
-            with open('codigo_3endercos.txt', 'w') as f:
-                for instruction in three_address_code:
-                    f.write(instruction + '\n')
+            # Salva em arquivo
+            with open('3aderecos.txt', 'w') as f:
+                f.write(formatted_code)
             
     except SyntaxError as e:
         print(f"Erro de sintaxe: {e}")
-        return  
+        return
     except Exception as e:
         print(f"Erro semântico: {e}")
-        return  
+        return
 
 if __name__ == "__main__":
     Main()

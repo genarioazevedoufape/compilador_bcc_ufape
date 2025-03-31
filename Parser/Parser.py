@@ -149,9 +149,25 @@ class Parser:
         return f"L{self.label_counter}"
 
     def emit(self, code):
-        """Adiciona uma instrução ao código de três endereços."""
-        self.code.append(code)
-        print(code)  # Exibe no terminal   
+        """Adiciona uma instrução ao código de três endereços com formatação."""
+        # Remove comentários duplicados e linhas vazias
+        if code.strip().startswith("//") and len(self.code) > 0 and self.code[-1].strip().startswith("//"):
+            return
+            
+        # Adiciona indentação baseada no contexto
+        indent = "    " * (self.loop_depth + len(self.scope_stack) - 1)
+        formatted_code = f"{indent}{code}"
+        
+        self.code.append(formatted_code)
+        # Removemos o print aqui para evitar duplicação
+
+    def get_formatted_code(self):
+        """Retorna o código de três endereços formatado com numeração."""
+        formatted = []
+        for i, instruction in enumerate(self.code, 1):
+            # Adiciona numeração de linha
+            formatted.append(f"{i:4d}: {instruction}")
+        return "\n".join(formatted) 
 
     def parse(self):
         """Inicia o processo de parsing com verificações finais."""
