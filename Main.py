@@ -23,17 +23,28 @@ def Main():
 
     print("=== Tokens Gerados ===")
     for token in tokens:
-        print(token)
+        print(f"Tipo: {token.tipo}, Lexema: '{token.lexema}', Linha: {token.linha}")
     print("======================")
 
     parser = Parser(tokens)
 
     try:
-        parser.parse()
+        three_address_code = parser.parse()
+        
+        if three_address_code is not None:
+            print("\n=== Código de Três Endereços Gerado ===")
+            for instruction in three_address_code:
+                print(instruction)
+            print("=======================================")
+            
+            with open('codigo_3endercos.txt', 'w') as f:
+                for instruction in three_address_code:
+                    f.write(instruction + '\n')
+            
     except SyntaxError as e:
         print(f"Erro de sintaxe: {e}")
         return  
-    except Exception as e:  # Captura erros semânticos, caso existam
+    except Exception as e:
         print(f"Erro semântico: {e}")
         return  
 

@@ -1,8 +1,6 @@
 int vA = 7;
 int vB = 15;
 int vX = 0;
-boolean vFlag = true;
-boolean vOutroFlag = false;
 
 func int fSomar(int v1, int v2) {
     return v1 + v2;
@@ -65,4 +63,3 @@ func int fParametros(int vF, boolean vG) {
 }
 
 print fParametros(10, true);
-
