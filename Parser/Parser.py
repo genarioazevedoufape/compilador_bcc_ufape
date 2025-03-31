@@ -137,21 +137,6 @@ class Parser:
                     self.error_semantico(f"Variável '{name}' usada antes de ser inicializada.")
                 return scope[name]["type"]
         self.error_semantico(f"Identificador '{name}' não declarado.")
-    
-    def new_temp(self):
-        """Gera um novo nome de variável temporária."""
-        self.temp_counter += 1
-        return f"t{self.temp_counter}"
-
-    def new_label(self):
-        """Gera um novo label."""
-        self.label_counter += 1
-        return f"L{self.label_counter}"
-
-    def emit(self, code):
-        """Adiciona uma instrução ao código de três endereços."""
-        self.code.append(code)
-        print(code)  # Exibe no terminal   
 
     def parse(self):
         """Inicia o processo de parsing com verificações finais."""
