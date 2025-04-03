@@ -1,0 +1,118 @@
+1. Teste de Escopo e Declarações
+
+int vGlobal = 10;
+
+func int fEscopoTeste(int vParametro) {
+    int vResultado;
+    vResultado = vGlobal + vParametro;  // OK - acesso a variável global
+    return vResultado;
+}
+
+proc pTeste(int vParametro) {
+    int vLocal = 20;
+    print vLocal;  // OK - variável local
+    print vParametro; // OK - parâmetro da função
+    print vGlobal; // OK - variável global
+    
+    // ERRO SEMÂNTICO (variável não declarada)
+    // print vOutra; 
+}
+
+vGlobal = 30; // ERRO SEMÂNTICO (declaração duplicada)
+
+2. Teste de Tipos e Operações
+
+func boolean fLogica(boolean vA, boolean vB) {
+    // OK - operações lógicas com booleanos
+    boolean vResultado = vA == vB; // OK - comparação de booleanos
+    return vResultado;
+}
+
+func int fAritmetica(int vX, int vY) {
+    // OK - operações aritméticas com inteiros
+    int vResultado = vX * vY + vX / vY - vY % 3; // OK - operações aritméticas
+    return vResultado;
+}
+
+proc pTipoErros(int vValor) {
+    int vNum = vValor;
+    boolean vFlag = true;
+    
+    // ERRO SEMÂNTICO (tipos incompatíveis)
+    // vNum = vFlag;
+    
+    // ERRO SEMÂNTICO (operação aritmética com boolean)
+    // int vErro = vNum + vFlag;
+    
+    // ERRO SEMÂNTICO (condição não booleana)
+    // if (vNum) { ... }
+}
+
+3. Teste de Funções e Procedimentos
+
+func int fFatorial(int vN) {
+    if (vN <= 1) {
+        return 1;
+    }
+    // OK - retorno em todos os caminhos
+    return vN * fFatorial(vN - 1);
+}
+
+proc pImprimeSoma(int vA, int vB) {
+    int vSoma = vA + vB;
+    print vSoma;
+    // OK - procedimento não precisa de retorno
+}
+
+// ERRO SEMÂNTICO (número de parâmetros incorreto)
+// pImprimeSoma(1, 2, 3);
+
+// ERRO SEMÂNTICO (tipo de parâmetro incorreto)
+// pImprimeSoma(true, false);
+
+4. Teste de Controle de Fluxo
+
+proc pLoopTeste(int vParametro) {
+    int vI = 0;
+    while (vI < vParametro) {
+        if (vI == 5) {
+            break;  // OK - dentro de loop
+        }
+        vI = vI + 1;
+    }
+    
+    // ERRO SEMÂNTICO (break fora de loop)
+    // break;
+    
+    if (true) {
+        // ERRO SEMÂNTICO (continue só em loops)
+        // continue;
+    }
+}
+
+proc pInicializacao(int vParametro) {
+    int vNaoInicializada;
+    boolean vFlag;
+
+    print vParametro;  // OK - parâmetro inicializado
+    
+    // ERRO SEMÂNTICO (uso antes de inicialização)
+    // print vNaoInicializada;
+    
+    // ERRO SEMÂNTICO (uso antes de inicialização)
+    // if (vFlag) { ... }
+    
+    vNaoInicializada = 10;
+    print vNaoInicializada;  // OK - agora inicializada
+}
+
+6. Teste de Variáveis Não Utilizadas
+
+func int fTesteNaoUtilizada() {
+    int vUtilizada = 5;
+    int vNaoUtilizada = 10;  // AVISO SEMÂNTICO (não utilizada)
+    boolean vOutraNaoUsada;  // AVISO SEMÂNTICO (não utilizada)
+    
+    return vUtilizada;
+}
+
