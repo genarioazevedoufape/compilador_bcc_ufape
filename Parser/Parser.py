@@ -81,11 +81,6 @@ class Parser:
                 self.error_semantico(f"Operação de comparação '{operator}' requer operandos do mesmo tipo, encontrados {left_type} e {right_type}")
             return "boolean"
         
-        elif operator in ["&&", "||"]:
-            if left_type != "boolean" or right_type != "boolean":
-                self.error_semantico(f"Operação lógica '{operator}' requer operandos booleanos, encontrados {left_type} e {right_type}")
-            return "boolean"
-        
         return None
     
     def check_return_paths(self, function_name, return_type):
