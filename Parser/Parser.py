@@ -3,17 +3,17 @@ class Parser:
     def __init__(self, tokens):
         self.tokens = tokens
         self.current = 0
-        self.loop_depth = 0  # Contador de contexto de loop
-        self.scope_stack = [{}]  # Pilha de escopos (inicia com o escopo global)
-        self.function_return_type = None  # Tipo de retorno da função atual
-        self.procedure_params = {}  # Dicionário para mapear procedimentos e seus parâmetros
-        self.function_params = {}  # Dicionário para mapear funções e seus parâmetros
-        self.temp_counter = 0  # Contador para variáveis temporárias
-        self.code = []  # Lista para armazenar o código de três endereços
-        self.label_counter = 0  # Contador para labels
-        self.used_variables = set()  # Rastreia variáveis usadas
-        self.declared_variables = set()  # Rastreia variáveis declaradas
-        self.uninitialized_vars = set()  # Rastreia variáveis não inicializadas
+        self.loop_depth = 0  
+        self.scope_stack = [{}]  
+        self.function_return_type = None  
+        self.procedure_params = {}  
+        self.function_params = {} 
+        self.temp_counter = 0  
+        self.code = []  
+        self.label_counter = 0  
+        self.used_variables = set()  
+        self.declared_variables = set()  
+        self.uninitialized_vars = set()  
 
     def current_token(self):
         return self.tokens[self.current] if self.current < len(self.tokens) else None
@@ -127,7 +127,7 @@ class Parser:
         """Retorna o tipo de um símbolo com verificações adicionais."""
         for scope in reversed(self.scope_stack):
             if name in scope:
-                scope[name]["used"] = True  # Marca como usado
+                scope[name]["used"] = True  
                 self.used_variables.add(name)
                 
                 if name in self.uninitialized_vars:
@@ -159,19 +159,16 @@ class Parser:
         formatted_code = f"{indent}{code}"
         
         self.code.append(formatted_code)
-        # Removemos o print aqui para evitar duplicação
 
     def get_formatted_code(self):
         """Retorna o código de três endereços formatado com numeração."""
         formatted = []
         for i, instruction in enumerate(self.code, 1):
-            # Adiciona numeração de linha
             formatted.append(f"{i:4d}: {instruction}")
         return "\n".join(formatted) 
 
     def parse(self):
         """Inicia o processo de parsing com verificações finais."""
-        print("\n=== Código de Três Endereços ===")
         try:
             result = self.programa()
             
@@ -179,11 +176,10 @@ class Parser:
             self.check_unused_variables()
             self.check_uninitialized_vars()
             
-            # Verifica se o último token foi processado corretamente
+
             if self.current_token() and self.current_token().tipo != "FIM":
                 self.error_sintatico("Fim inesperado do parsing")
                 
-            # Retorna o código gerado se o parsing foi bem-sucedido
             return self.code if result else None
                 
         except (SyntaxError, ValueError) as e:
@@ -196,7 +192,7 @@ class Parser:
     def programa(self):
         """Processa o programa principal."""
         if self.bloco():
-            print("Parsing completo sem erros.")
+            print("Parsing completo sem erros.\n\n")
         else:
             self.error_sintatico("Erro ao interpretar o programa.")
         return True
@@ -206,7 +202,6 @@ class Parser:
         while self.current_token():
             token = self.current_token()
             
-            # Se encontrar um } ou FIM, retorna True para indicar fim do bloco
             if token.tipo in ["RCBRACK", "FIM"]:
                 return True
                 
@@ -278,7 +273,7 @@ class Parser:
     def atribuicao_variavel(self):
         """Processa uma atribuição de variável marcando como inicializada."""
         var_name = self.tokens[self.current].lexema
-        # Primeiro verifica se a variável existe
+
         var_type = None
         for scope in reversed(self.scope_stack):
             if var_name in scope:
@@ -389,7 +384,6 @@ class Parser:
                         self.emit(f"{loop_label}:")
                         self.emit(f"// Bloco do while")
                         
-                        # Processa o bloco até encontrar RCBRACK
                         while True:
                             token = self.current_token()
                             if not token:
@@ -505,21 +499,17 @@ class Parser:
 
                 self.emit(f"return {expr_temp}")
 
-                # Só exige ponto e vírgula se não for o último comando do bloco
                 if self.current_token() and self.current_token().tipo != "RCBRACK":
                     if not self.match("SEMICOLON"):
                         self.error_sintatico("Esperado ';' após o retorno.")
 
-                # Marca que encontrou um retorno
                 self.scope_stack[-1]["_has_return"] = True
                 has_return = True
                 continue
 
-            # Processa outras declarações normalmente
             if self.declaracao_variavel():
                 continue
             elif self.comando_condicional_com_retorno(expected_return_type):
-                # Verifica se o comando condicional tem retorno em ambos os ramos
                 if self.scope_stack[-1].get("_has_return", False):
                     has_return = True
                 continue
@@ -538,7 +528,6 @@ class Parser:
             else:
                 break
 
-        # Verifica se o bloco tem retorno em todos os caminhos (se necessário)
         if expected_return_type != "void" and not has_return:
             self.error_semantico(f"Função não retorna valor em todos os caminhos.")
 
@@ -559,13 +548,12 @@ class Parser:
                 
                 if self.match("RBRACK"):
                     if self.match("LCBRACK"):
-                        # Processa bloco do if
+
                         if_has_return = self.bloco_com_retorno(expected_return_type)
                         if self.match("RCBRACK"):
-                            # Processa else se existir
+   
                             else_has_return = self.else_opcional_com_retorno(expected_return_type, end_label)
                             
-                            # Se ambos os ramos têm retorno, marca como tendo retorno
                             if if_has_return and else_has_return:
                                 self.scope_stack[-1]["_has_return"] = True
                             return True
@@ -594,7 +582,7 @@ class Parser:
     def lista_parametros(self):
         """Processa a lista de parâmetros marcando-os como inicializados."""
         params = []
-        if self.match("RBRACK"):  # Caso não haja parâmetros
+        if self.match("RBRACK"):  
             return params
         
         tipo = self.especificador_tipo()
@@ -603,7 +591,7 @@ class Parser:
         
         if self.match("ID_VAR"):
             param_name = self.tokens[self.current - 1].lexema
-            self.add_symbol(param_name, tipo, is_param=True)  # Marca como parâmetro
+            self.add_symbol(param_name, tipo, is_param=True)  
             params.append({"type": tipo})
             
             while self.match("COMMA"):
@@ -613,7 +601,7 @@ class Parser:
                 
                 if self.match("ID_VAR"):
                     param_name = self.tokens[self.current - 1].lexema
-                    self.add_symbol(param_name, tipo, is_param=True)  # Marca como parâmetro
+                    self.add_symbol(param_name, tipo, is_param=True)  
                     params.append({"type": tipo})
                 else:
                     self.error_sintatico("Esperado identificador do parâmetro.")

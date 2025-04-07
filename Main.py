@@ -11,7 +11,7 @@ def Main():
 
     print("=== Código de Entrada ===")
     print(codigo_exemplo)
-    print("=========================")
+    print("=========================\n\n")
   
     scanner = Scanner(codigo_exemplo)
 
@@ -21,10 +21,10 @@ def Main():
         print(f"Erro ao escanear o código: {e}")
         return
 
-    print("=== Tokens Gerados ===")
-    for token in tokens:
-        print(f"Tipo: {token.tipo}, Lexema: '{token.lexema}', Linha: {token.linha}")
-    print("======================")
+    # print("=== Tokens Gerados ===")
+    # for token in tokens:
+    #     print(f"Tipo: {token.tipo}, Lexema: '{token.lexema}', Linha: {token.linha}")
+    # print("======================")
 
     parser = Parser(tokens)
 
@@ -33,9 +33,9 @@ def Main():
         success = parser.parse()
         
         if success:
-            print("\n=== Código de Três Endereços Otimizado ===")
+            # print("\n=== Código de Três Endereços Otimizado ===")
             formatted_code = parser.get_formatted_code()
-            print(formatted_code)
+            # print(formatted_code)
             
             # Salva em arquivo
             with open('3aderecos.txt', 'w') as f:
